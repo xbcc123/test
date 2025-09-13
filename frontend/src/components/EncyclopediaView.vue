@@ -1,14 +1,14 @@
 <template>
-  <div class="container">
-    <h2>宠物百科</h2>
+  <section class="encyclopedia-section">
+    <h2 class="encyclopedia-title">宠物百科</h2>
     <div class="error" v-if="error">{{ error }}</div>
-    <ul>
-      <li v-for="e in encyclopedias" :key="e.id">
-        <b>{{ e.title }}</b> [{{ e.type }}]<br />
-        {{ e.content }}
+    <ul class="encyclopedia-list">
+      <li v-for="e in encyclopedias" :key="e.id" class="encyclopedia-list-item">
+        <b>{{ e.title }}</b> <span class="encyclopedia-type">[{{ e.type }}]</span><br />
+        <span class="encyclopedia-content">{{ e.content }}</span>
       </li>
     </ul>
-  </div>
+  </section>
 </template>
 
 <script setup>
@@ -31,8 +31,46 @@ onMounted(loadEncyclopedias)
 </script>
 
 <style scoped>
-.container { max-width: 700px; margin: 40px auto; background: #fff; padding: 24px; border-radius: 8px; box-shadow: 0 2px 8px #0001; }
-.error { color: #d00; margin-bottom: 12px; }
-ul { padding-left: 20px; }
+.encyclopedia-section {
+  margin-bottom: 24px;
+  padding: 0;
+  border: none;
+}
+.encyclopedia-title {
+  color: #1565c0;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 18px;
+  letter-spacing: 1px;
+}
+.encyclopedia-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.encyclopedia-list-item {
+  padding: 12px 0 10px 0;
+  border-bottom: 1px solid #e3f2fd;
+  color: #1976d2;
+  font-size: 16px;
+  transition: background 0.2s;
+}
+.encyclopedia-list-item:last-child {
+  border-bottom: none;
+}
+.encyclopedia-list-item:hover {
+  background: #f5fafd;
+}
+.encyclopedia-type {
+  color: #64b5f6;
+  font-size: 13px;
+  font-weight: 500;
+}
+.encyclopedia-content {
+  color: #333;
+  font-size: 15px;
+  display: inline-block;
+  margin-top: 2px;
+}
+.error { color: #1976d2; margin-bottom: 12px; }
 </style>
-

@@ -1,14 +1,14 @@
 <template>
-  <div class="container">
-    <h2>资讯中心</h2>
+  <section class="article-section">
+    <h2 class="article-title">资讯中心</h2>
     <div class="error" v-if="error">{{ error }}</div>
-    <ul>
-      <li v-for="a in articles" :key="a.id">
-        <b>{{ a.title }}</b> [{{ a.category }}]<br />
-        {{ a.content }}
+    <ul class="article-list">
+      <li v-for="a in articles" :key="a.id" class="article-list-item">
+        <b>{{ a.title }}</b> <span class="article-category">[{{ a.category }}]</span><br />
+        <span class="article-content">{{ a.content }}</span>
       </li>
     </ul>
-  </div>
+  </section>
 </template>
 
 <script setup>
@@ -31,8 +31,46 @@ onMounted(loadArticles)
 </script>
 
 <style scoped>
-.container { max-width: 700px; margin: 40px auto; background: #fff; padding: 24px; border-radius: 8px; box-shadow: 0 2px 8px #0001; }
-.error { color: #d00; margin-bottom: 12px; }
-ul { padding-left: 20px; }
+.article-section {
+  margin-bottom: 24px;
+  padding: 0;
+  border: none;
+}
+.article-title {
+  color: #1565c0;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 18px;
+  letter-spacing: 1px;
+}
+.article-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.article-list-item {
+  padding: 12px 0 10px 0;
+  border-bottom: 1px solid #e3f2fd;
+  color: #1976d2;
+  font-size: 16px;
+  transition: background 0.2s;
+}
+.article-list-item:last-child {
+  border-bottom: none;
+}
+.article-list-item:hover {
+  background: #f5fafd;
+}
+.article-category {
+  color: #64b5f6;
+  font-size: 13px;
+  font-weight: 500;
+}
+.article-content {
+  color: #333;
+  font-size: 15px;
+  display: inline-block;
+  margin-top: 2px;
+}
+.error { color: #1976d2; margin-bottom: 12px; }
 </style>
-

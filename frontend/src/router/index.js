@@ -7,6 +7,7 @@ import EncyclopediaView from '../components/EncyclopediaView.vue'
 import CommunityView from '../components/CommunityView.vue'
 import ServiceView from '../components/ServiceView.vue'
 import MemberView from '../components/MemberView.vue'
+import AdminView from '../components/AdminView.vue'
 
 const routes = [
   { path: '/login', component: LoginView },
@@ -16,7 +17,7 @@ const routes = [
   { path: '/encyclopedia', component: EncyclopediaView },
   { path: '/community', component: CommunityView },
   { path: '/service', component: ServiceView },
-  { path: '/member', component: MemberView }
+  { path: '/admin', component: AdminView },
 ]
 
 const router = createRouter({

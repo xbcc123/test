@@ -1,25 +1,27 @@
 <template>
-  <div class="container">
-    <h2>Cat 列表</h2>
+  <section class="cat-section">
+    <h2 class="cat-title">Cat 列表</h2>
     <div class="error" v-if="error">{{ error }}</div>
-    <table>
-      <thead>
-        <tr><th>ID</th><th>名字</th><th>年龄</th><th>品种</th><th>性别</th><th>体重</th><th>颜色</th><th>描述</th></tr>
-      </thead>
-      <tbody>
-        <tr v-for="cat in cats" :key="cat.id">
-          <td>{{ cat.id }}</td>
-          <td>{{ cat.name }}</td>
-          <td>{{ cat.age }}</td>
-          <td>{{ cat.breed }}</td>
-          <td>{{ cat.gender }}</td>
-          <td>{{ cat.weight }}</td>
-          <td>{{ cat.color }}</td>
-          <td>{{ cat.description }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+    <div class="cat-table-wrapper">
+      <table class="cat-table">
+        <thead>
+          <tr><th>ID</th><th>名字</th><th>年龄</th><th>品种</th><th>性别</th><th>体重</th><th>颜色</th><th>描述</th></tr>
+        </thead>
+        <tbody>
+          <tr v-for="cat in cats" :key="cat.id">
+            <td>{{ cat.id }}</td>
+            <td>{{ cat.name }}</td>
+            <td>{{ cat.age }}</td>
+            <td>{{ cat.breed }}</td>
+            <td>{{ cat.gender }}</td>
+            <td>{{ cat.weight }}</td>
+            <td>{{ cat.color }}</td>
+            <td>{{ cat.description }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
 </template>
 
 <script setup>
@@ -43,10 +45,37 @@ onMounted(loadCats)
 </script>
 
 <style scoped>
-.container { max-width: 900px; margin: 40px auto; background: #fff; padding: 24px; border-radius: 8px; box-shadow: 0 2px 8px #0001; }
-.error { color: #d00; margin-bottom: 12px; }
-table { width: 100%; border-collapse: collapse; margin-top: 24px; }
-th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-th { background: #f0f0f0; }
+.cat-section {
+  margin-bottom: 24px;
+  padding: 0;
+  border: none;
+}
+.cat-title {
+  color: #1565c0;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 18px;
+  letter-spacing: 1px;
+}
+.cat-table-wrapper {
+  overflow-x: auto;
+}
+.cat-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: transparent;
+}
+.cat-table th, .cat-table td {
+  border: 1px solid #dde6f6;
+  padding: 8px;
+  text-align: center;
+}
+.cat-table th {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+.cat-table tr:nth-child(even) {
+  background: #f5fafd;
+}
+.error { color: #1976d2; margin-bottom: 12px; }
 </style>
-

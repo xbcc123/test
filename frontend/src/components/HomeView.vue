@@ -1,28 +1,21 @@
 <template>
-  <div class="container">
-    <nav style="margin-bottom:24px;">
-      <router-link to="/">首页</router-link>
-      <router-link to="/articles">资讯中心</router-link>
-      <router-link to="/encyclopedia">宠物百科</router-link>
-      <router-link to="/community">社区互动</router-link>
-      <router-link to="/service">服务与资源</router-link>
-      <router-link to="/member">会员中心</router-link>
-      <button style="float:right" @click="logout">退出</button>
-    </nav>
-    <h2>🐾 宠物之家</h2>
-    <div>欢迎来到宠物之家！这里有最新的宠物资讯、百科、社区互动和丰富的服务资源。</div>
-    <div style="margin-top:20px;">
-      <b>推荐文章：</b>
-      <ul>
-        <li v-for="a in articles" :key="a.id">{{ a.title }}</li>
+  <div>
+    <h2 class="home-title">🐾 宠物之家</h2>
+    <div class="home-desc">欢迎来到宠物之家！这里有最新的宠物资讯、百科、社区互动和丰富的服务资源。</div>
+    <section class="home-section">
+      <h3 class="section-title">推荐文章</h3>
+      <ul class="home-list">
+        <li v-for="a in articles" :key="a.id" class="home-list-item">{{ a.title }}</li>
       </ul>
-    </div>
-    <div style="margin-top:20px;">
-      <b>热门宠物：</b>
-      <ul>
-        <li v-for="c in cats" :key="c.id">{{ c.name }}<span v-if="c.breed">（{{ c.breed }}）</span></li>
+    </section>
+    <section class="home-section">
+      <h3 class="section-title">热门宠物</h3>
+      <ul class="home-list">
+        <li v-for="c in cats" :key="c.id" class="home-list-item">
+          {{ c.name }}<span v-if="c.breed">（{{ c.breed }}）</span>
+        </li>
       </ul>
-    </div>
+    </section>
   </div>
 </template>
 
@@ -31,6 +24,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from '../utils/axios'
 import { getToken, removeToken } from '../utils/auth'
+import Layout from './Layout.vue'
 
 const articles = ref([])
 const cats = ref([])
@@ -59,8 +53,45 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.container { max-width: 600px; margin: 40px auto; background: #fff; padding: 24px; border-radius: 8px; box-shadow: 0 2px 8px #0001; }
-nav { margin-bottom: 24px; }
-nav a { margin-right: 8px; }
+.home-title {
+  color: #1565c0;
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+.home-desc {
+  color: #1976d2;
+  font-size: 16px;
+  margin-bottom: 24px;
+}
+.home-section {
+  margin-bottom: 24px;
+  padding: 0;
+  border: none;
+}
+.section-title {
+  color: #1976d2;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.home-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.home-list-item {
+  padding: 8px 0;
+  border-bottom: 1px solid #e3f2fd;
+  color: #1565c0;
+  font-size: 16px;
+  transition: background 0.2s;
+}
+.home-list-item:last-child {
+  border-bottom: none;
+}
+.home-list-item:hover {
+  background: #f5fafd;
+}
 </style>
-

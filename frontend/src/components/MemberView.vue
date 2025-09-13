@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div>
     <h2>会员中心</h2>
     <div class="error" v-if="error">{{ error }}</div>
     <div v-if="user">
@@ -42,7 +42,5 @@ onMounted(loadMember)
 </script>
 
 <style scoped>
-.container { max-width: 700px; margin: 40px auto; background: #fff; padding: 24px; border-radius: 8px; box-shadow: 0 2px 8px #0001; }
-.error { color: #d00; margin-bottom: 12px; }
+.error { color: #1976d2; margin-bottom: 12px; }
 </style>
-
