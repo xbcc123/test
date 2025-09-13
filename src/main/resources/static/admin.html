@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>后台管理</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 0; }
+        .container { max-width: 900px; margin: 40px auto; background: #fff; padding: 24px; border-radius: 8px; box-shadow: 0 2px 8px #0001; }
+        h2 { text-align: center; }
+        .tab-btns { margin-bottom: 20px; }
+        .tab-btns button { margin-right: 8px; }
+        .form-group { margin-bottom: 16px; }
+        label { display: block; margin-bottom: 4px; }
+        input, select, textarea { width: 100%; padding: 8px; box-sizing: border-box; }
+        table { width: 100%; border-collapse: collapse; margin-top: 24px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        th { background: #f0f0f0; }
+        .error { color: #d00; margin-bottom: 12px; }
+        .actions button { margin-right: 4px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>后台管理</h2>
+    <div class="tab-btns">
+        <button onclick="showTab('cat')">猫管理</button>
+        <button onclick="showTab('article')">文章管理</button>
+        <button onclick="showTab('encyclopedia')">宠物百科管理</button>
+        <button onclick="showTab('community')">社区互动管理</button>
+        <button onclick="showTab('service')">服务与资源管理</button>
+        <button onclick="showTab('member')">会员中心管理</button>
+        <!-- 可扩展更多管理模块 -->
+    </div>
+    <div id="cat-panel" style="display:none;"></div>
+    <div id="article-panel" style="display:none;"></div>
+    <div id="encyclopedia-panel" style="display:none;"></div>
+    <div id="community-panel" style="display:none;"></div>
+    <div id="service-panel" style="display:none;"></div>
+    <div id="member-panel" style="display:none;"></div>
+</div>
+<script>
+const API_BASE = '';
+
+function showTab(tab) {
+    document.getElementById('cat-panel').style.display = tab === 'cat' ? '' : 'none';
+    document.getElementById('article-panel').style.display = tab === 'article' ? '' : 'none';
+    document.getElementById('encyclopedia-panel').style.display = tab === 'encyclopedia' ? '' : 'none';
+    document.getElementById('community-panel').style.display = tab === 'community' ? '' : 'none';
+    document.getElementById('service-panel').style.display = tab === 'service' ? '' : 'none';
+    document.getElementById('member-panel').style.display = tab === 'member' ? '' : 'none';
+    if (tab === 'cat') renderCatPanel();
+    if (tab === 'article') renderArticlePanel();
+    if (tab === 'encyclopedia') renderEncyclopediaPanel();
+    if (tab === 'community') renderCommunityPanel();
+    if (tab === 'service') renderServicePanel();
+    if (tab === 'member') renderMemberPanel();
+}
+
+// 猫管理
+function renderCatPanel() {
+    const panel = document.getElementById('cat-panel');
+    panel.innerHTML = `
+        <div class="error" id="cat-error"></div>
+        <form id="cat-form" onsubmit="return saveCatAdmin()">
+            <input type="hidden" id="cat-id">
+            <div class="form-group">
+                <label for="cat-name">名字</label>
+                <input type="text" id="cat-name" name="cat-name" required>
+            </div>
+            <div class="form-group">
+                <label for="cat-age">年龄</label>
+                <input type="number" id="cat-age" name="cat-age" required min="0">
+            </div>
+            <div class="form-group">
+                <label for="cat-breed">品种</label>
+                <input type="text" id="cat-breed" name="cat-breed">
+            </div>
+            <div class="form-group">
+                <label for="cat-gender">性别</label>
+                <select id="cat-gender" name="cat-gender">
+                    <option value="">请选择</option>
+                    <option value="公">公</option>
+                    <option value="母">母</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="cat-weight">体重(kg)</label>
+                <input type="number" id="cat-weight" name="cat-weight" min="0" step="0.01">
+            </div>
+            <div class="form-group">
+                <label for="cat-color">颜色</label>
+                <input type="text" id="cat-color" name="cat-color">
+            </div>
+            <div class="form-group">
+                <label for="cat-description">描述</label>
+                <input type="text" id="cat-description" name="cat-description">
+            </div>
+            <button type="submit" id="cat-save-btn">新增</button>
+            <button type="button" onclick="resetCatFormAdmin()">重置</button>
+        </form>
+        <table style="margin-top:16px;">
+            <thead>
+                <tr><th>ID</th><th>名字</th><th>年��</th><th>品种</th><th>性别</th><th>体重</th><th>颜��</th><th>描述</th><th>操作</th></tr>
+            </thead>
+            <tbody id="cat-list"></tbody>
+        </table>
+    `;
+    loadCatsAdmin();
+}
+function loadCatsAdmin() {
+    document.getElementById('cat-error').textContent = '';
+    fetch(API_BASE + '/cats', {
+        headers: { 'Authorization': 'Bearer ' + getToken() }
+    })
+    .then(r => r.json().then(data => ({ok: r.ok, data})))
+    .then(res => {
+        if (res.ok) {
+            renderCatListAdmin(res.data);
+        } else {
+            document.getElementById('cat-error').textContent = res.data.error || '加载失败';
+        }
+    })
+    .catch(() => document.getElementById('cat-error').textContent = '网络错误');
+}
+function renderCatListAdmin(cats) {
+    const list = document.getElementById('cat-list');
+    list.innerHTML = '';
+    cats.forEach(cat => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${cat.id}</td><td>${cat.name}</td><td>${cat.age}</td>
+            <td>${cat.breed || ''}</td><td>${cat.gender || ''}</td><td>${cat.weight || ''}</td>
+            <td>${cat.color || ''}</td><td>${cat.description || ''}</td>
+            <td class="actions">
+                <button onclick="editCatAdmin(${cat.id}, '${cat.name}', ${cat.age}, '${cat.breed || ''}', '${cat.gender || ''}', ${cat.weight || 0}, '${cat.color || ''}', '${cat.description || ''}')">编辑</button>
+                <button onclick="deleteCatAdmin(${cat.id})">删除</button>
+            </td>`;
+        list.appendChild(tr);
+    });
+}
+function saveCatAdmin() {
+    document.getElementById('cat-error').textContent = '';
+    const id = document.getElementById('cat-id').value;
+    const name = document.getElementById('cat-name').value.trim();
+    const age = parseInt(document.getElementById('cat-age').value, 10);
+    const breed = document.getElementById('cat-breed').value.trim();
+    const gender = document.getElementById('cat-gender').value;
+    const weight = parseFloat(document.getElementById('cat-weight').value) || 0;
+    const color = document.getElementById('cat-color').value.trim();
+    const description = document.getElementById('cat-description').value.trim();
+    if (!name || isNaN(age)) return false;
+    const method = id ? 'PUT' : 'POST';
+    const url = API_BASE + '/cats' + (id ? '/' + id : '');
+    fetch(url, {
+        method,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + getToken()
+        },
+        body: JSON.stringify({ name, age, breed, gender, weight, color, description })
+    })
+    .then(r => r.json().then(data => ({ok: r.ok, data})))
+    .then(res => {
+        if (res.ok) {
+            resetCatFormAdmin();
+            loadCatsAdmin();
+        } else {
+            document.getElementById('cat-error').textContent = res.data.error || '保存失败';
+        }
+    })
+    .catch(() => document.getElementById('cat-error').textContent = '网络错误');
+    return false;
+}
+function editCatAdmin(id, name, age, breed, gender, weight, color, description) {
+    document.getElementById('cat-id').value = id;
+    document.getElementById('cat-name').value = name;
+    document.getElementById('cat-age').value = age;
+    document.getElementById('cat-breed').value = breed;
+    document.getElementById('cat-gender').value = gender;
+    document.getElementById('cat-weight').value = weight;
+    document.getElementById('cat-color').value = color;
+    document.getElementById('cat-description').value = description;
+    document.getElementById('cat-save-btn').textContent = '保存';
+}
+function resetCatFormAdmin() {
+    document.getElementById('cat-id').value = '';
+    document.getElementById('cat-name').value = '';
+    document.getElementById('cat-age').value = '';
+    document.getElementById('cat-breed').value = '';
+    document.getElementById('cat-gender').value = '';
+    document.getElementById('cat-weight').value = '';
+    document.getElementById('cat-color').value = '';
+    document.getElementById('cat-description').value = '';
+    document.getElementById('cat-save-btn').textContent = '新增';
+}
+function deleteCatAdmin(id) {
+    if (!confirm('确定要删除这只猫吗？')) return;
+    fetch(API_BASE + '/cats/' + id, {
+        method: 'DELETE',
+        headers: { 'Authorization': 'Bearer ' + getToken() }
+    })
+    .then(r => r.json().then(data => ({ok: r.ok, data})))
+    .then(res => {
+        if (res.ok) {
+            loadCatsAdmin();
+        } else {
+            document.getElementById('cat-error').textContent = res.data.error || '删除失败';
+        }
+    })
+    .catch(() => document.getElementById('cat-error').textContent = '网络错误');
+}
+
+// 文章管理
+function renderArticlePanel() {
+    const panel = document.getElementById('article-panel');
+    panel.innerHTML = `
+        <div class="error" id="article-error"></div>
+        <form id="article-form" onsubmit="return saveArticleAdmin(event)">
+            <input type="hidden" id="article-id">
+            <div class="form-group">
+                <label for="article-title">标题</label>
+                <input type="text" id="article-title" name="article-title" required>
+            </div>
+            <div class="form-group">
+                <label for="article-category">分类</label>
+                <input type="text" id="article-category" name="article-category" required>
+            </div>
+            <div class="form-group">
+                <label for="article-content">内容</label>
+                <textarea id="article-content" name="article-content" required></textarea>
+            </div>
+            <button type="submit">保存</button>
+            <button type="button" onclick="resetArticleFormAdmin()">重置</button>
+        </form>
+        <table style="margin-top:16px;">
+            <thead>
+                <tr><th>ID</th><th>标题</th><th>分类</th><th>内容</th><th>操作</th></tr>
+            </thead>
+            <tbody id="article-list"></tbody>
+        </table>
+    `;
+    loadArticlesAdmin();
+}
+function loadArticlesAdmin() {
+    document.getElementById('article-error').textContent = '';
+    fetch(API_BASE + '/articles', {
+        headers: { 'Authorization': 'Bearer ' + getToken() }
+    })
+    .then(r => r.json().then(data => ({ok: r.ok, data})))
+    .then(res => {
+        if (res.ok) {
+            renderArticleListAdmin(res.data);
+        } else {
+            document.getElementById('article-error').textContent = res.data.error || '加载失败';
+        }
+    })
+    .catch(() => document.getElementById('article-error').textContent = '网��错误');
+}
+function renderArticleListAdmin(articles) {
+    const list = document.getElementById('article-list');
+    list.innerHTML = '';
+    articles.forEach(a => {
+        const tr = document.createElement('tr');
+        // 防止XSS和引号问题，转义所有字段
+        const safe = str => String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+        tr.innerHTML = `<td>${safe(a.id)}</td><td>${safe(a.title)}</td><td>${safe(a.category)}</td><td>${safe(a.content)}</td>
+            <td class="actions">
+                <button onclick="editArticleAdmin(${safe(a.id)}, '${safe(a.title)}', '${safe(a.category)}', '${safe(a.content)}')">编辑</button>
+                <button onclick="deleteArticleAdmin(${safe(a.id)})">删除</button>
+            </td>`;
+        list.appendChild(tr);
+    });
+}
+function saveArticleAdmin(e) {
+    e.preventDefault();
+    document.getElementById('article-error').textContent = '';
+    const id = document.getElementById('article-id').value;
+    const title = document.getElementById('article-title').value;
+    const category = document.getElementById('article-category').value;
+    const content = document.getElementById('article-content').value;
+    const method = id ? 'PUT' : 'POST';
+    const url = API_BASE + '/articles' + (id ? '/' + id : '');
+    fetch(url, {
+        method,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + getToken()
+        },
+        body: JSON.stringify({ title, category, content })
+    })
+    .then(r => r.json().then(data => ({ok: r.ok, data})))
+    .then(res => {
+        if (res.ok) {
+            resetArticleFormAdmin();
+            loadArticlesAdmin();
+        } else {
+            document.getElementById('article-error').textContent = res.data.error || '保存失败';
+        }
+    })
+    .catch(() => document.getElementById('article-error').textContent = '网络错误');
+    return false;
+}
+function editArticleAdmin(id, title, category, content) {
+    document.getElementById('article-id').value = id;
+    document.getElementById('article-title').value = title;
+    document.getElementById('article-category').value = category;
+    document.getElementById('article-content').value = content;
+}
+function resetArticleFormAdmin() {
+    document.getElementById('article-id').value = '';
+    document.getElementById('article-title').value = '';
+    document.getElementById('article-category').value = '';
+    document.getElementById('article-content').value = '';
+}
+function deleteArticleAdmin(id) {
+    if (!confirm('确定要删除这篇文章吗？')) return;
+    fetch(API_BASE + '/articles/' + id, {
+        method: 'DELETE',
+        headers: { 'Authorization': 'Bearer ' + getToken() }
+    })
+    .then(r => r.json().then(data => ({ok: r.ok, data})))
+    .then(res => {
+        if (res.ok) {
+            loadArticlesAdmin();
+        } else {
+            document.getElementById('article-error').textContent = res.data.error || '删除失败';
+        }
+    })
+    .catch(() => document.getElementById('article-error').textContent = '网络错误');
+}
+
+// 宠物百科管理
+function renderEncyclopediaPanel() {
+    const panel = document.getElementById('encyclopedia-panel');
+    panel.innerHTML = `
+        <div class="error" id="encyclopedia-error"></div>
+        <form id="encyclopedia-form" onsubmit="return saveEncyclopediaAdmin(event)">
+            <input type="hidden" id="encyclopedia-id">
+            <div class="form-group">
+                <label for="encyclopedia-title">标题</label>
+                <input type="text" id="encyclopedia-title" name="encyclopedia-title" required>
+            </div>
+            <div class="form-group">
+                <label for="encyclopedia-type">类型</label>
+                <input type="text" id="encyclopedia-type" name="encyclopedia-type" required>
+            </div>
+            <div class="form-group">
+                <label for="encyclopedia-content">内容</label>
+                <textarea id="encyclopedia-content" name="encyclopedia-content" required></textarea>
+            </div>
+            <button type="submit">保存</button>
+            <button type="button" onclick="resetEncyclopediaFormAdmin()">重置</button>
+        </form>
+        <table style="margin-top:16px;">
+            <thead>
+                <tr><th>ID</th><th>标题</th><th>类型</th><th>内容</th><th>操作</th></tr>
+            </thead>
+            <tbody id="encyclopedia-list"></tbody>
+        </table>
+    `;
+    loadEncyclopediasAdmin();
+}
+function loadEncyclopediasAdmin() {
+    document.getElementById('encyclopedia-error').textContent = '';
+    fetch(API_BASE + '/encyclopedias', {
+        headers: { 'Authorization': 'Bearer ' + getToken() }
+    })
+    .then(r => r.json().then(data => ({ok: r.ok, data})))
+    .then(res => {
+        if (res.ok) {
+            renderEncyclopediaListAdmin(res.data);
+        } else {
+            document.getElementById('encyclopedia-error').textContent = res.data.error || '加载失败';
+        }
+    })
+    .catch(() => document.getElementById('encyclopedia-error').textContent = '网络错误');
+}
+function renderEncyclopediaListAdmin(list) {
+    const tbody = document.getElementById('encyclopedia-list');
+    tbody.innerHTML = '';
+    const safe = str => String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+    list.forEach(e => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${safe(e.id)}</td><td>${safe(e.title)}</td><td>${safe(e.type)}</td><td>${safe(e.content)}</td>
+            <td class="actions">
+                <button onclick="editEncyclopediaAdmin(${safe(e.id)}, '${safe(e.title)}', '${safe(e.type)}', '${safe(e.content)}')">编辑</button>
+                <button onclick="deleteEncyclopediaAdmin(${safe(e.id)})">删除</button>
+            </td>`;
+        tbody.appendChild(tr);
+    });
+}
+function saveEncyclopediaAdmin(e) {
+    e.preventDefault();
+    document.getElementById('encyclopedia-error').textContent = '';
+    const id = document.getElementById('encyclopedia-id').value;
+    const title = document.getElementById('encyclopedia-title').value;
+    const type = document.getElementById('encyclopedia-type').value;
+    const content = document.getElementById('encyclopedia-content').value;
+    const method = id ? 'PUT' : 'POST';
+    const url = API_BASE + '/encyclopedias' + (id ? '/' + id : '');
+    fetch(url, {
+        method,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + getToken()
+        },
+        body: JSON.stringify({ title, type, content })
+    })
+    .then(r => r.json().then(data => ({ok: r.ok, data})))
+    .then(res => {
+        if (res.ok) {
+            resetEncyclopediaFormAdmin();
+            loadEncyclopediasAdmin();
+        } else {
+            document.getElementById('encyclopedia-error').textContent = res.data.error || '保存失败';
+        }
+    })
+    .catch(() => document.getElementById('encyclopedia-error').textContent = '网络错误');
+    return false;
+}
+function editEncyclopediaAdmin(id, title, type, content) {
+    document.getElementById('encyclopedia-id').value = id;
+    document.getElementById('encyclopedia-title').value = title;
+    document.getElementById('encyclopedia-type').value = type;
+    document.getElementById('encyclopedia-content').value = content;
+}
+function resetEncyclopediaFormAdmin() {
+    document.getElementById('encyclopedia-id').value = '';
+    document.getElementById('encyclopedia-title').value = '';
+    document.getElementById('encyclopedia-type').value = '';
+    document.getElementById('encyclopedia-content').value = '';
+}
+function deleteEncyclopediaAdmin(id) {
+    if (!confirm('确定要删除这条百科吗？')) return;
+    fetch(API_BASE + '/encyclopedias/' + id, {
+        method: 'DELETE',
+        headers: { 'Authorization': 'Bearer ' + getToken() }
+    })
+    .then(r => r.json().then(data => ({ok: r.ok, data})))
+    .then(res => {
+        if (res.ok) {
+            loadEncyclopediasAdmin();
+        } else {
+            document.getElementById('encyclopedia-error').textContent = res.data.error || '删除失败';
+        }
+    })
+    .catch(() => document.getElementById('encyclopedia-error').textContent = '网络错误');
+}
+
+// 社区互动管理
+function renderCommunityPanel() {
+    const panel = document.getElementById('community-panel');
+    panel.innerHTML = `
+        <div class="error" id="community-error"></div>
+        <form id="community-form" onsubmit="return saveCommunityAdmin(event)">
+            <input type="hidden" id="community-id">
+            <div class="form-group">
+                <label for="community-userId">用户ID</label>
+                <input type="text" id="community-userId" name="community-userId" required>
+            </div>
+            <div class="form-group">
+                <label for="community-type">类型</label>
+                <input type="text" id="community-type" name="community-type" required>
+            </div>
+            <div class="form-group">
+                <label for="community-content">内容</label>
+                <textarea id="community-content" name="community-content" required></textarea>
+            </div>
+            <button type="submit">保存</button>
+            <button type="button" onclick="resetCommunityFormAdmin()">重置</button>
+        </form>
+        <table style="margin-top:16px;">
+            <thead>
+                <tr><th>ID</th><th>用户ID</th><th>类型</th><th>内容</th><th>操作</th></tr>
+            </thead>
+            <tbody id="community-list"></tbody>
+        </table>
+    `;
+    loadCommunityAdmin();
+}
+function loadCommunityAdmin() {
+    document.getElementById('community-error').textContent = '';
+    fetch(API_BASE + '/posts', {
+        headers: { 'Authorization': 'Bearer ' + getToken() }
+    })
+    .then(r => r.json().then(data => ({ok: r.ok, data})))
+    .then(res => {
+        if (res.ok) {
+            renderCommunityListAdmin(res.data);
+        } else {
+            document.getElementById('community-error').textContent = res.data.error || '加载失败';
+        }
+    })
+    .catch(() => document.getElementById('community-error').textContent = '网络错误');
+}
+function renderCommunityListAdmin(list) {
+    const tbody = document.getElementById('community-list');
+    tbody.innerHTML = '';
+    const safe = str => String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+    list.forEach(e => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${safe(e.id)}</td><td>${safe(e.userId)}</td><td>${safe(e.type)}</td><td>${safe(e.content)}</td>
+            <td class="actions">
+                <button onclick="editCommunityAdmin(${safe(e.id)}, '${safe(e.userId)}', '${safe(e.type)}', '${safe(e.content)}')">编辑</button>
+                <button onclick="deleteCommunityAdmin(${safe(e.id)})">删除</button>
+            </td>`;
+        tbody.appendChild(tr);
+    });
+}
+function saveCommunityAdmin(e) {
+    e.preventDefault();
+    document.getElementById('community-error').textContent = '';
+    const id = document.getElementById('community-id').value;
+    const userId = document.getElementById('community-userId').value;
+    const type = document.getElementById('community-type').value;
+    const content = document.getElementById('community-content').value;
+    const method = id ? 'PUT' : 'POST';
+    const url = API_BASE + '/posts' + (id ? '/' + id : '');
+    fetch(url, {
+        method,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + getToken()
+        },
+        body: JSON.stringify({ userId, type, content })
+    })
+    .then(r => r.json().then(data => ({ok: r.ok, data})))
+    .then(res => {
+        if (res.ok) {
+            resetCommunityFormAdmin();
+            loadCommunityAdmin();
+        } else {
+            document.getElementById('community-error').textContent = res.data.error || '保存失败';
+        }
+    })
+    .catch(() => document.getElementById('community-error').textContent = '网络错误');
+    return false;
+}
+function editCommunityAdmin(id, userId, type, content) {
+    document.getElementById('community-id').value = id;
+    document.getElementById('community-userId').value = userId;
+    document.getElementById('community-type').value = type;
+    document.getElementById('community-content').value = content;
+}
+function resetCommunityFormAdmin() {
+    document.getElementById('community-id').value = '';
+    document.getElementById('community-userId').value = '';
+    document.getElementById('community-type').value = '';
+    document.getElementById('community-content').value = '';
+}
+function deleteCommunityAdmin(id) {
+    if (!confirm('确定要删除这条社区内容吗？')) return;
+    fetch(API_BASE + '/posts/' + id, {
+        method: 'DELETE',
+        headers: { 'Authorization': 'Bearer ' + getToken() }
+    })
+    .then(r => r.json().then(data => ({ok: r.ok, data})))
+    .then(res => {
+        if (res.ok) {
+            loadCommunityAdmin();
+        } else {
+            document.getElementById('community-error').textContent = res.data.error || '删除失败';
+        }
+    })
+    .catch(() => document.getElementById('community-error').textContent = '网络错误');
+}
+
+// 服务与��源管理
+function renderServicePanel() {
+    const panel = document.getElementById('service-panel');
+    panel.innerHTML = `
+        <div class="error" id="service-error"></div>
+        <form id="service-form" onsubmit="return saveServiceAdmin(event)">
+            <input type="hidden" id="service-id">
+            <div class="form-group">
+                <label for="service-name">名称</label>
+                <input type="text" id="service-name" name="service-name" required>
+            </div>
+            <div class="form-group">
+                <label for="service-address">地址</label>
+                <input type="text" id="service-address" name="service-address" required>
+            </div>
+            <div class="form-group">
+                <label for="service-phone">电话</label>
+                <input type="text" id="service-phone" name="service-phone">
+            </div>
+            <div class="form-group">
+                <label for="service-rating">评分</label>
+                <input type="number" id="service-rating" name="service-rating" min="0" max="5" step="0.1">
+            </div>
+            <div class="form-group">
+                <label for="service-description">描述</label>
+                <textarea id="service-description" name="service-description"></textarea>
+            </div>
+            <button type="submit">保存</button>
+            <button type="button" onclick="resetServiceFormAdmin()">重置</button>
+        </form>
+        <table style="margin-top:16px;">
+            <thead>
+                <tr><th>ID</th><th>名称</th><th>地址</th><th>电话</th><th>评分</th><th>描述</th><th>操作</th></tr>
+            </thead>
+            <tbody id="service-list"></tbody>
+        </table>
+    `;
+    loadServiceAdmin();
+}
+function loadServiceAdmin() {
+    document.getElementById('service-error').textContent = '';
+    fetch(API_BASE + '/hospitals', {
+        headers: { 'Authorization': 'Bearer ' + getToken() }
+    })
+    .then(r => r.json().then(data => ({ok: r.ok, data})))
+    .then(res => {
+        if (res.ok) {
+            renderServiceListAdmin(res.data);
+        } else {
+            document.getElementById('service-error').textContent = res.data.error || '加载失败';
+        }
+    })
+    .catch(() => document.getElementById('service-error').textContent = '网络错误');
+}
+function renderServiceListAdmin(list) {
+    const tbody = document.getElementById('service-list');
+    tbody.innerHTML = '';
+    const safe = str => String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+    list.forEach(e => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${safe(e.id)}</td><td>${safe(e.name)}</td><td>${safe(e.address)}</td><td>${safe(e.phone)}</td><td>${safe(e.rating)}</td><td>${safe(e.description)}</td>
+            <td class="actions">
+                <button onclick="editServiceAdmin(${safe(e.id)}, '${safe(e.name)}', '${safe(e.address)}', '${safe(e.phone)}', ${safe(e.rating)}, '${safe(e.description)}')">编辑</button>
+                <button onclick="deleteServiceAdmin(${safe(e.id)})">删除</button>
+            </td>`;
+        tbody.appendChild(tr);
+    });
+}
+function saveServiceAdmin(e) {
+    e.preventDefault();
+    document.getElementById('service-error').textContent = '';
+    const id = document.getElementById('service-id').value;
+    const name = document.getElementById('service-name').value;
+    const address = document.getElementById('service-address').value;
+    const phone = document.getElementById('service-phone').value;
+    const rating = parseFloat(document.getElementById('service-rating').value) || 0;
+    const description = document.getElementById('service-description').value;
+    const method = id ? 'PUT' : 'POST';
+    const url = API_BASE + '/hospitals' + (id ? '/' + id : '');
+    fetch(url, {
+        method,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + getToken()
+        },
+        body: JSON.stringify({ name, address, phone, rating, description })
+    })
+    .then(r => r.json().then(data => ({ok: r.ok, data})))
+    .then(res => {
+        if (res.ok) {
+            resetServiceFormAdmin();
+            loadServiceAdmin();
+        } else {
+            document.getElementById('service-error').textContent = res.data.error || '保存失败';
+        }
+    })
+    .catch(() => document.getElementById('service-error').textContent = '网络错误');
+    return false;
+}
+function editServiceAdmin(id, name, address, phone, rating, description) {
+    document.getElementById('service-id').value = id;
+    document.getElementById('service-name').value = name;
+    document.getElementById('service-address').value = address;
+    document.getElementById('service-phone').value = phone;
+    document.getElementById('service-rating').value = rating;
+    document.getElementById('service-description').value = description;
+}
+function resetServiceFormAdmin() {
+    document.getElementById('service-id').value = '';
+    document.getElementById('service-name').value = '';
+    document.getElementById('service-address').value = '';
+    document.getElementById('service-phone').value = '';
+    document.getElementById('service-rating').value = '';
+    document.getElementById('service-description').value = '';
+}
+function deleteServiceAdmin(id) {
+    if (!confirm('确定要删除这条服务吗？')) return;
+    fetch(API_BASE + '/hospitals/' + id, {
+        method: 'DELETE',
+        headers: { 'Authorization': 'Bearer ' + getToken() }
+    })
+    .then(r => r.json().then(data => ({ok: r.ok, data})))
+    .then(res => {
+        if (res.ok) {
+            loadServiceAdmin();
+        } else {
+            document.getElementById('service-error').textContent = res.data.error || '删除失败';
+        }
+    })
+    .catch(() => document.getElementById('service-error').textContent = '网络错误');
+}
+// 会员中心管理（支持增删改查）
+function renderMemberPanel() {
+    const panel = document.getElementById('member-panel');
+    panel.innerHTML = `
+        <div class="error" id="member-error"></div>
+        <form id="member-form" onsubmit="return saveMemberAdmin(event)">
+            <input type="hidden" id="member-id">
+            <div class="form-group">
+                <label for="member-username">用户名</label>
+                <input type="text" id="member-username" name="member-username" required>
+            </div>
+            <div class="form-group">
+                <label for="member-password">密码</label>
+                <input type="password" id="member-password" name="member-password" required>
+            </div>
+            <div class="form-group">
+                <label for="member-score">积分</label>
+                <input type="number" id="member-score" name="member-score" min="0" step="1">
+            </div>
+            <div class="form-group">
+                <label for="member-role">角色</label>
+                <input type="text" id="member-role" name="member-role">
+            </div>
+            <button type="submit">保存</button>
+            <button type="button" onclick="resetMemberFormAdmin()">重置</button>
+        </form>
+        <table style="margin-top:16px;">
+            <thead>
+                <tr><th>ID</th><th>用户名</th><th>积分</th><th>角色</th><th>操作</th></tr>
+            </thead>
+            <tbody id="member-list"></tbody>
+        </table>
+    `;
+    loadMemberAdmin();
+}
+function loadMemberAdmin() {
+    document.getElementById('member-error').textContent = '';
+    fetch(API_BASE + '/users', {
+        headers: { 'Authorization': 'Bearer ' + getToken() }
+    })
+    .then(r => r.json().then(data => ({ok: r.ok, data})))
+    .then(res => {
+        if (res.ok) {
+            renderMemberListAdmin(res.data);
+        } else {
+            document.getElementById('member-error').textContent = res.data.error || '加载失败';
+        }
+    })
+    .catch(() => document.getElementById('member-error').textContent = '网络错误');
+}
+function renderMemberListAdmin(list) {
+    const tbody = document.getElementById('member-list');
+    tbody.innerHTML = '';
+    const safe = str => String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+    list.forEach(e => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${safe(e.id)}</td><td>${safe(e.username)}</td><td>${safe(e.score)}</td><td>${safe(e.role)}</td>
+            <td class="actions">
+                <button onclick="editMemberAdmin(${safe(e.id)}, '${safe(e.username)}', '', ${safe(e.score)}, '${safe(e.role)}')">编辑</button>
+                <button onclick="deleteMemberAdmin(${safe(e.id)})">删除</button>
+            </td>`;
+        tbody.appendChild(tr);
+    });
+}
+function saveMemberAdmin(e) {
+    e.preventDefault();
+    document.getElementById('member-error').textContent = '';
+    const id = document.getElementById('member-id').value;
+    const username = document.getElementById('member-username').value;
+    const password = document.getElementById('member-password').value;
+    const score = parseInt(document.getElementById('member-score').value, 10) || 0;
+    const role = document.getElementById('member-role').value;
+    const method = id ? 'PUT' : 'POST';
+    const url = API_BASE + '/users' + (id ? '/' + id : '');
+    fetch(url, {
+        method,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + getToken()
+        },
+        body: JSON.stringify({ username, password, score, role })
+    })
+    .then(r => r.json().then(data => ({ok: r.ok, data})))
+    .then(res => {
+        if (res.ok) {
+            resetMemberFormAdmin();
+            loadMemberAdmin();
+        } else {
+            document.getElementById('member-error').textContent = res.data.error || '保存失败';
+        }
+    })
+    .catch(() => document.getElementById('member-error').textContent = '网络错误');
+    return false;
+}
+function editMemberAdmin(id, username, password, score, role) {
+    document.getElementById('member-id').value = id;
+    document.getElementById('member-username').value = username;
+    document.getElementById('member-password').value = password;
+    document.getElementById('member-score').value = score;
+    document.getElementById('member-role').value = role;
+}
+function resetMemberFormAdmin() {
+    document.getElementById('member-id').value = '';
+    document.getElementById('member-username').value = '';
+    document.getElementById('member-password').value = '';
+    document.getElementById('member-score').value = '';
+    document.getElementById('member-role').value = '';
+}
+function deleteMemberAdmin(id) {
+    if (!confirm('确定要删除该会员吗？')) return;
+    fetch(API_BASE + '/users/' + id, {
+        method: 'DELETE',
+        headers: { 'Authorization': 'Bearer ' + getToken() }
+    })
+    .then(r => r.json().then(data => ({ok: r.ok, data})))
+    .then(res => {
+        if (res.ok) {
+            loadMemberAdmin();
+        } else {
+            document.getElementById('member-error').textContent = res.data.error || '删除失败';
+        }
+    })
+    .catch(() => document.getElementById('member-error').textContent = '网络错误');
+}
+
+function getToken() {
+    return localStorage.getItem('token') || '';
+}
+
+window.onload = function() {
+    showTab('cat');
+}
+</script>
+</body>
+</html>
