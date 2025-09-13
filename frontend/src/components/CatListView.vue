@@ -5,7 +5,7 @@
     <div class="cat-table-wrapper">
       <table class="cat-table">
         <thead>
-          <tr><th>ID</th><th>名字</th><th>年龄</th><th>品种</th><th>性别</th><th>体重</th><th>颜色</th><th>描述</th></tr>
+          <tr><th>ID</th><th>名字</th><th>年龄</th><th>品种</th><th>性别</th><th>体重</th><th>颜色</th><th>描述</th><th>图片</th></tr>
         </thead>
         <tbody>
           <tr v-for="cat in cats" :key="cat.id">
@@ -17,6 +17,9 @@
             <td>{{ cat.weight }}</td>
             <td>{{ cat.color }}</td>
             <td>{{ cat.description }}</td>
+            <td>
+              <img v-if="cat.imageUrl" :src="cat.imageUrl" alt="cat image" style="max-width:60px;max-height:60px;object-fit:cover;" />
+            </td>
           </tr>
         </tbody>
       </table>

@@ -35,16 +35,23 @@
         <label>描述</label>
         <input v-model="form.description" />
       </div>
+      <div class="form-group">
+        <label>图片URL</label>
+        <input v-model="form.imageUrl" placeholder="https://example.com/cat.jpg" />
+      </div>
       <button type="submit">{{form.id ? '保存' : '新增'}}</button>
       <button type="button" @click="resetForm">重置</button>
     </form>
     <table class="admin-table">
       <thead>
-        <tr><th>ID</th><th>名字</th><th>年龄</th><th>品种</th><th>性别</th><th>体重</th><th>颜色</th><th>描述</th><th>操作</th></tr>
+        <tr><th>ID</th><th>名字</th><th>年龄</th><th>品种</th><th>性别</th><th>体重</th><th>颜色</th><th>描述</th><th>图片</th><th>操作</th></tr>
       </thead>
       <tbody>
         <tr v-for="cat in cats" :key="cat.id">
           <td>{{cat.id}}</td><td>{{cat.name}}</td><td>{{cat.age}}</td><td>{{cat.breed}}</td><td>{{cat.gender}}</td><td>{{cat.weight}}</td><td>{{cat.color}}</td><td>{{cat.description}}</td>
+          <td>
+            <img v-if="cat.imageUrl" :src="cat.imageUrl" alt="cat image" style="max-width:60px;max-height:60px;object-fit:cover;" />
+          </td>
           <td>
             <button @click="editCat(cat)">编辑</button>
             <button @click="deleteCat(cat.id)">删除</button>
@@ -61,7 +68,7 @@ import axios from '../../utils/axios'
 
 const cats = ref([])
 const error = ref('')
-const form = ref({ id: '', name: '', age: '', breed: '', gender: '', weight: '', color: '', description: '' })
+const form = ref({ id: '', name: '', age: '', breed: '', gender: '', weight: '', color: '', description: '', imageUrl: '' })
 
 function loadCats() {
   error.value = ''
@@ -83,7 +90,7 @@ function editCat(cat) {
   form.value = { ...cat }
 }
 function resetForm() {
-  form.value = { id: '', name: '', age: '', breed: '', gender: '', weight: '', color: '', description: '' }
+  form.value = { id: '', name: '', age: '', breed: '', gender: '', weight: '', color: '', description: '', imageUrl: '' }
 }
 function deleteCat(id) {
   if (!confirm('确定要删除这只猫吗？')) return
@@ -104,4 +111,3 @@ th { background: #f0f0f0; }
 .error { color: #d00; margin-bottom: 12px; }
 button { margin-right: 6px; }
 </style>
-
