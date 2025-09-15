@@ -5,8 +5,10 @@
     <b>宠物医院：</b>
     <ul class="service-list">
       <li v-for="h in hospitals" :key="h.id" class="service-list-item">
-        <b>{{ h.name }}</b> {{ h.address }} {{ h.phone }} 评分:{{ h.rating || '-' }}<br />
-        <span class="service-content">{{ h.description }}</span>
+        <router-link :to="`/service/${h.id}`">
+          <b>{{ h.name }}</b>
+        </router-link>
+        {{ h.address }} {{ h.phone }} 评分:{{ h.rating || '-' }}
       </li>
     </ul>
   </section>
@@ -61,12 +63,6 @@ onMounted(loadHospitals)
 }
 .service-list-item:hover {
   background: #f5fafd;
-}
-.service-content {
-  color: #333;
-  font-size: 15px;
-  display: inline-block;
-  margin-top: 2px;
 }
 .error { color: #1976d2; margin-bottom: 12px; }
 </style>

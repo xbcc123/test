@@ -23,6 +23,7 @@ public class Cat {
     private Double weight; // 体重
     private String color; // 颜色
     private String description; // 描述
+    private String imageUrl; // 猫的图片URL
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createTime; // 创建时间
@@ -99,6 +100,14 @@ public class Cat {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public LocalDateTime getCreateTime() {

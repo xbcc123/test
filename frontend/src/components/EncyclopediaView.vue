@@ -4,8 +4,10 @@
     <div class="error" v-if="error">{{ error }}</div>
     <ul class="encyclopedia-list">
       <li v-for="e in encyclopedias" :key="e.id" class="encyclopedia-list-item">
-        <b>{{ e.title }}</b> <span class="encyclopedia-type">[{{ e.type }}]</span><br />
-        <span class="encyclopedia-content">{{ e.content }}</span>
+        <router-link :to="`/encyclopedia/${e.id}`">
+          <b>{{ e.title }}</b>
+        </router-link>
+        <span class="encyclopedia-type">[{{ e.type }}]</span>
       </li>
     </ul>
   </section>
@@ -65,12 +67,6 @@ onMounted(loadEncyclopedias)
   color: #64b5f6;
   font-size: 13px;
   font-weight: 500;
-}
-.encyclopedia-content {
-  color: #333;
-  font-size: 15px;
-  display: inline-block;
-  margin-top: 2px;
 }
 .error { color: #1976d2; margin-bottom: 12px; }
 </style>

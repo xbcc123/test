@@ -38,19 +38,7 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                    "/login",
-                    "/",
-                    "/index.html",
-                    "/admin.html",
-                    "/static/**",
-                    "/cats", "/cats/**",
-                    "/articles", "/articles/**",
-                    "/encyclopedias", "/encyclopedias/**",
-                    "/posts", "/posts/**",
-                    "/hospitals", "/hospitals/**"
-                ).permitAll()
-                .anyRequest().authenticated()
+                .anyRequest().permitAll() // 所有请求都允许，无403
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

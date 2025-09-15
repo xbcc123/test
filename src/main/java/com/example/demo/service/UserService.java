@@ -1,26 +1,50 @@
 package com.example.demo.service;
 
 import com.example.demo.model.User;
+import com.example.demo.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class UserService {
-    // 简单内存用户数据，实际可用数据库
-    private static final Map<String, String> USER_MAP = new HashMap<>();
-    static {
-        USER_MAP.put("admin", "admin123");
-        USER_MAP.put("user", "user123");
-    }
+    @Autowired
+    private UserRepository userRepository;
 
     public User validateUser(String username, String password) {
-        String pwd = USER_MAP.get(username);
-        if (pwd != null && pwd.equals(password)) {
-            return new User(username, null); // 不返回密码
+        Optional<User> userOpt = userRepository.findById(username);
+        if (userOpt.isPresent() && userOpt.get().getPassword().equals(password)) {
+            User user = userOpt.get();
+            user.setPassword(null); // 不返回密码
+            return user;
         }
         return null;
     }
-}
 
+    public boolean registerUser(User user) {
+        if (userRepository.existsById(user.getUsername())) return false;
+        user.setScore(0);
+        user.setRole("user");
+        user.setStatus("正常");
+        userRepository.save(user);
+        return true;
+    }
+
+    public boolean resetPassword(String username, String newPassword) {
+        Optional<User> userOpt = userRepository.findById(username);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            user.setPassword(newPassword);
+            userRepository.save(user);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean updateUserInfo(User user) {
+        if (!userRepository.existsById(user.getUsername())) return false;
+        userRepository.save(user);
+        return true;
+    }
+}

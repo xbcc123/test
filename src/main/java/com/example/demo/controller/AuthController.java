@@ -31,5 +31,26 @@ public class AuthController {
             return ResponseEntity.status(401).body(result);
         }
     }
-}
 
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody User user) {
+        boolean ok = userService.registerUser(user);
+        if (ok) {
+            return ResponseEntity.ok().body("注册成功");
+        } else {
+            return ResponseEntity.status(409).body("用户名已存在");
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> req) {
+        String username = req.get("username");
+        String newPassword = req.get("newPassword");
+        boolean ok = userService.resetPassword(username, newPassword);
+        if (ok) {
+            return ResponseEntity.ok().body("密码重置成功");
+        } else {
+            return ResponseEntity.status(404).body("用户不存在");
+        }
+    }
+}
