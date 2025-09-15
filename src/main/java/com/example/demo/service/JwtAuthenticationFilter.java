@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.model.CustomUserDetails;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,7 +33,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             username = jwtUtil.getUsernameFromToken(token);
         }
         if (username != null && jwtUtil.validateToken(token) && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = User.withUsername(username).password("").authorities(Collections.emptyList()).build();
+            Long userId = jwtUtil.getUserIdFromToken(token);
+            CustomUserDetails userDetails = new CustomUserDetails(userId, username, "", Collections.emptyList());
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                     userDetails, null, userDetails.getAuthorities());
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
@@ -41,4 +43,3 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 }
-

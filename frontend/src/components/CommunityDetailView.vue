@@ -85,7 +85,7 @@ const loadLike = async () => {
   try {
     const res = await axios.get('/likes/count', { params: { postId: route.params.id } })
     likeCount.value = res.data.count || 0
-    const check = await axios.get('/likes/check', { params: { postId: route.params.id, userId } })
+    const check = await axios.get('/likes/check', { params: { postId: route.params.id } })
     liked.value = !!check.data.liked
   } catch (e) {
     // 忽略错误
@@ -98,9 +98,9 @@ const toggleLike = async () => {
   likeLoading.value = true
   try {
     if (liked.value) {
-      await axios.delete('/likes', { params: { postId: route.params.id, userId } })
+      await axios.delete('/likes', { params: { postId: route.params.id } })
     } else {
-      await axios.post('/likes', { postId: route.params.id, userId })
+      await axios.post('/likes', { postId: route.params.id })
     }
     await loadLike()
   } catch (e) {
