@@ -2,6 +2,8 @@ package com.example.demo.controller;
 
 import com.example.demo.model.Encyclopedia;
 import com.example.demo.repository.EncyclopediaRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,32 +14,38 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/encyclopedias")
+@Tag(name = "百科接口", description = "百科相关操作")
 public class EncyclopediaController {
     @Autowired
     private EncyclopediaRepository encyclopediaRepository;
 
     @GetMapping
+    @Operation(summary = "获取所有百科", description = "获取所有百科条目列表")
     public List<Encyclopedia> getAll() {
         return encyclopediaRepository.findAll();
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "根据ID获取百科", description = "根据ID获取单个百科详情")
     public Encyclopedia getById(@PathVariable Long id) {
         return encyclopediaRepository.findById(id).orElse(null);
     }
 
     @PostMapping
+    @Operation(summary = "创建百科", description = "创建一条新百科")
     public Encyclopedia create(@RequestBody Encyclopedia encyclopedia) {
         return encyclopediaRepository.save(encyclopedia);
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "更新百科", description = "根据ID更新百科内容")
     public Encyclopedia update(@PathVariable Long id, @RequestBody Encyclopedia encyclopedia) {
         encyclopedia.setId(id);
         return encyclopediaRepository.save(encyclopedia);
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "删除百科", description = "根据ID删除百科")
     public void delete(@PathVariable Long id) {
         encyclopediaRepository.deleteById(id);
     }

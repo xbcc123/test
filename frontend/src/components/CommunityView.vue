@@ -1,44 +1,51 @@
 <template>
-  <section class="community-section">
-    <h2 class="community-title">社区互动</h2>
-    <div class="community-actions">
-      <input v-model="searchKeyword" @keyup.enter="searchPosts" placeholder="搜索内容..." />
-      <button @click="showPostForm = !showPostForm">发帖</button>
-    </div>
-    <form v-if="showPostForm" class="post-form" @submit.prevent="submitPost">
-      <textarea v-model="newPost.content" placeholder="说点什么..." required></textarea>
-      <select v-model="newPost.type">
-        <option value="">请选择类型</option>
-        <option value="经验">经验</option>
-        <option value="日常">日常</option>
-      </select>
-      <button type="submit">提交</button>
-      <button type="button" @click="showPostForm = false">取消</button>
-    </form>
-    <div class="error" v-if="error">{{ error }}</div>
-    <div v-if="loading">加载中...</div>
-    <ul class="community-list" v-else-if="posts.length">
-      <li v-for="p in posts" :key="p.id" class="community-list-item">
-        <router-link :to="`/community/${p.id}`">
-          <b>用户{{ p.userId }}</b>
-        </router-link>
-        <span class="community-type">[{{ p.type }}]</span>
-        <span class="community-content">{{ p.content.slice(0, 30) }}...</span>
-        <button @click="deletePost(p.id)" class="delete-btn">删除</button>
-      </li>
-    </ul>
-    <div v-else>暂无数据</div>
-    <div class="pagination">
-      <button @click="prevPage" :disabled="page === 0">上一页</button>
-      <span>第 {{ page + 1 }} 页 / 共 {{ totalPages }} 页</span>
-      <button @click="nextPage" :disabled="page + 1 >= totalPages">下一页</button>
-    </div>
+  <section class="max-w-3xl mx-auto py-10">
+    <h2 class="text-3xl font-bold text-blue-900 mb-6">社区互动</h2>
+    <Card customClass="mb-6 p-6">
+      <div class="flex gap-4 mb-4">
+        <Input v-model="searchKeyword" placeholder="搜索内容..." @keyup.enter="searchPosts" />
+        <Button @click="showPostForm = !showPostForm">{{ showPostForm ? '收起' : '发帖' }}</Button>
+      </div>
+      <form v-if="showPostForm" class="space-y-3 mb-4" @submit.prevent="submitPost">
+        <textarea v-model="newPost.content" placeholder="说点什么..." required class="w-full border rounded-lg p-3 min-h-[60px] focus:ring-2 focus:ring-blue-400"></textarea>
+        <select v-model="newPost.type" class="w-full border rounded-lg p-2">
+          <option value="">请选择类型</option>
+          <option value="经验">经验</option>
+          <option value="日常">日常</option>
+        </select>
+        <div class="flex gap-2">
+          <Button type="submit">提交</Button>
+          <Button variant="secondary" type="button" @click="showPostForm = false">取消</Button>
+        </div>
+      </form>
+      <div v-if="error" class="text-red-500 text-sm mb-2">{{ error }}</div>
+      <div v-if="loading" class="text-gray-500">加载中...</div>
+      <ul v-else-if="posts.length" class="space-y-3">
+        <li v-for="p in posts" :key="p.id" class="flex items-center justify-between bg-blue-50 rounded-lg px-4 py-3">
+          <div class="flex flex-col">
+            <router-link :to="`/community/${p.id}`" class="font-bold text-blue-800 hover:underline">用户{{ p.userId }}</router-link>
+            <span class="text-xs text-blue-500">[{{ p.type }}]</span>
+            <span class="text-gray-700 mt-1">{{ p.content.slice(0, 30) }}...</span>
+          </div>
+          <Button variant="secondary" @click="deletePost(p.id)">删除</Button>
+        </li>
+      </ul>
+      <div v-else class="text-gray-400">暂无数据</div>
+      <div class="flex items-center justify-between mt-6">
+        <Button variant="secondary" @click="prevPage" :disabled="page === 0">上一页</Button>
+        <span class="text-gray-600">第 {{ page + 1 }} 页 / 共 {{ totalPages }} 页</span>
+        <Button variant="secondary" @click="nextPage" :disabled="page + 1 >= totalPages">下一页</Button>
+      </div>
+    </Card>
   </section>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from '../utils/axios'
+import Card from './ui/Card.vue'
+import Input from './ui/Input.vue'
+import Button from './ui/Button.vue'
 
 const posts = ref([])
 const error = ref('')
@@ -103,7 +110,6 @@ const submitPost = async () => {
 }
 
 const deletePost = async (id) => {
-  if (!confirm('确定要删除吗？')) return
   try {
     await axios.delete(`/posts/${id}`)
     loadPosts()
@@ -112,70 +118,7 @@ const deletePost = async (id) => {
   }
 }
 
-onMounted(loadPosts)
+onMounted(() => {
+  loadPosts()
+})
 </script>
-
-<style scoped>
-.community-section {
-  margin-bottom: 24px;
-  padding: 0;
-  border: none;
-}
-.community-title {
-  color: #1565c0;
-  font-size: 22px;
-  font-weight: 700;
-  margin-bottom: 18px;
-  letter-spacing: 1px;
-}
-.community-actions {
-  margin-bottom: 12px;
-}
-.community-actions input {
-  padding: 4px 8px;
-  margin-right: 8px;
-}
-.post-form {
-  margin-bottom: 16px;
-}
-.post-form textarea {
-  width: 60%;
-  min-height: 60px;
-  margin-right: 8px;
-}
-.post-form select {
-  margin-right: 8px;
-}
-.delete-btn {
-  margin-left: 12px;
-  color: #d00;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-.community-list {
-  list-style: none;
-  padding: 0;
-}
-.community-list-item {
-  margin-bottom: 10px;
-  padding: 8px 0;
-  border-bottom: 1px solid #eee;
-}
-.community-type {
-  color: #888;
-  margin-left: 8px;
-}
-.community-content {
-  margin-left: 12px;
-  color: #333;
-}
-.pagination {
-  margin-top: 18px;
-  text-align: center;
-}
-.error {
-  color: #d00;
-  margin-bottom: 12px;
-}
-</style>
