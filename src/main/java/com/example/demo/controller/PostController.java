@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.model.CustomUserDetails;
 import com.example.demo.model.Post;
 import com.example.demo.repository.PostRepository;
 import io.swagger.v3.oas.annotations.Operation;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,7 +35,9 @@ public class PostController {
 
     @PostMapping
     @Operation(summary = "创建帖子", description = "创建一条新帖子")
-    public Post create(@RequestBody Post post) {
+    public Post create(@RequestBody Post post, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        post.setUserId(userDetails.getUserId());
+        post.setUsername(userDetails.getUsername());
         return postRepository.save(post);
     }
 

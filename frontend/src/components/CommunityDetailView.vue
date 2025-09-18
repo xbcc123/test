@@ -2,7 +2,8 @@
   <section class="community-detail-section" v-if="post">
     <h2 class="community-detail-title">社区互动详情</h2>
     <div class="community-detail-meta">
-      <span>用户ID：{{ post.userId }}</span>
+      <span v-if="post.username">用户名：{{ post.username }}</span>
+      <span v-else>用户ID：{{ post.userId }}</span>
       <span v-if="post.type"> | 类型：{{ post.type }}</span>
       <span v-if="post.createTime"> | 发布时间：{{ formatDate(post.createTime) }}</span>
     </div>

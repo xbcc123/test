@@ -1,5 +1,6 @@
 <script setup>
 import Layout from './components/Layout.vue'
+import "@/assets/global.css"
 </script>
 
 <template>

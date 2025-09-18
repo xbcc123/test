@@ -6,14 +6,14 @@
         <Input v-model="searchKeyword" placeholder="搜索内容..." @keyup.enter="searchPosts" />
         <Button @click="showPostForm = !showPostForm">{{ showPostForm ? '收起' : '发帖' }}</Button>
       </div>
-      <form v-if="showPostForm" class="space-y-3 mb-4" @submit.prevent="submitPost">
-        <textarea v-model="newPost.content" placeholder="���点什么..." required class="w-full border rounded-lg p-3 min-h-[60px] focus:ring-2 focus:ring-blue-400"></textarea>
-        <select v-model="newPost.type" class="w-full border rounded-lg p-2">
+      <form v-if="showPostForm" class="space-y-3 mb-4 bg-blue-100 rounded-lg p-4 shadow" @submit.prevent="submitPost">
+        <textarea v-model="newPost.content" placeholder="聊点什么..." required class="w-full border border-blue-300 rounded-lg p-3 min-h-[60px] focus:ring-2 focus:ring-blue-400 bg-white"></textarea>
+        <select v-model="newPost.type" class="w-full border border-blue-300 rounded-lg p-2 bg-white">
           <option value="">请选择类型</option>
           <option value="经验">经验</option>
           <option value="日常">日常</option>
         </select>
-        <div class="flex gap-2">
+        <div class="flex gap-2 justify-end">
           <Button type="submit">提交</Button>
           <Button variant="secondary" type="button" @click="showPostForm = false">取消</Button>
         </div>
@@ -21,13 +21,16 @@
       <div v-if="error" class="text-red-500 text-sm mb-2">{{ error }}</div>
       <div v-if="loading" class="text-gray-500">加载中...</div>
       <ul v-else-if="posts.length" class="space-y-3">
-        <li v-for="p in posts" :key="p.id" class="flex items-center justify-between bg-blue-50 rounded-lg px-4 py-3">
-          <div class="flex flex-col">
-            <router-link :to="`/community/${p.id}`" class="font-bold text-blue-800 hover:underline">用户{{ p.userId }}</router-link>
-            <span class="text-xs text-blue-500">[{{ p.type }}]</span>
-            <span class="text-gray-700 mt-1">{{ p.content.slice(0, 30) }}...</span>
+        <li v-for="p in posts" :key="p.id" class="flex items-start justify-between bg-white rounded-lg px-4 py-3 shadow hover:shadow-lg transition-all">
+          <div class="flex flex-col flex-1 min-w-0">
+            <div class="flex items-center gap-2 mb-1">
+              <router-link :to="`/community/${p.id}`" class="font-bold text-blue-800 hover:underline truncate max-w-[120px]">{{ p.username }}</router-link>
+              <span class="text-xs text-blue-500 bg-blue-100 rounded px-2 py-0.5 ml-1">{{ p.type }}</span>
+              <span class="text-xs text-gray-400 ml-2">{{ p.createTime ? (new Date(p.createTime).toLocaleString()) : '' }}</span>
+            </div>
+            <router-link :to="`/community/${p.id}`" class="text-gray-700 mt-1 hover:text-blue-700 truncate">{{ p.content.length > 60 ? p.content.slice(0, 60) + '...' : p.content }}</router-link>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 ml-4">
             <LikeButton :postId="p.id" />
             <Button variant="secondary" @click="deletePost(p.id)">删除</Button>
           </div>

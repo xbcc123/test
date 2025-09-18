@@ -1,4 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@400;700&display=swap');
+/* 其它全局样式可继续补充 */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@400;700&display=swap');@import "tailwindcss";
+@import "tailwindcss";
+
 
 /* 全局基础样式 */
 html, body {
@@ -26,6 +29,4 @@ input, textarea {
 }
 
 /* 头部、导航、页脚等可在组件内用 Tailwind 组合 */
-
-/* 其它全局样式可继续补充 */
 
