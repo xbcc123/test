@@ -1,63 +1,75 @@
 <template>
-  <div class="space-y-10">
+  <div>
     <!-- Banner 区块 -->
-    <div class="w-full h-64 bg-gradient-to-r from-blue-900 to-blue-500 rounded-2xl flex items-center px-16 mb-8">
-      <div class="text-white max-w-xl">
-        <h1 class="text-4xl font-bold mb-4">企业数字化解决方案专家</h1>
-        <p class="text-lg mb-6 opacity-90">一站式企业服务平台，提供智能化系统集成、云计算服务与专业技术支持，加速企业转型升级。</p>
-        <Button class="btn btn-primary px-8 py-3 font-bold">立即咨询</Button>
+    <a-card class="mb-8 banner-card" :bordered="false" style="background: linear-gradient(90deg, #1e3a8a 0%, #3b82f6 100%); color: #fff;">
+      <div style="max-width: 600px;">
+        <a-typography-title level="1" style="color:#fff;">企业数字化解决方案专家</a-typography-title>
+        <a-typography-paragraph style="color:#fff;opacity:0.9;">
+          一站式企业服务平台，提供智能化系统集成、云计算服务与专业技术支持，加速企业转型升级。
+        </a-typography-paragraph>
+        <a-button type="primary" size="large">立即咨询</a-button>
       </div>
-    </div>
+    </a-card>
 
     <!-- 推荐文章区块 -->
-    <Card customClass="mb-8">
-      <h3 class="text-xl font-bold text-blue-800 mb-4">推荐文章</h3>
-      <ul>
-        <li v-for="a in articles" :key="a.id" class="py-2 border-b last:border-b-0 border-blue-50 text-blue-700 hover:bg-blue-50 px-2 cursor-pointer">
-          {{ a.title }}
-        </li>
-      </ul>
-    </Card>
+    <a-card class="mb-8">
+      <a-typography-title level="3" style="color:#1e40af;">推荐文章</a-typography-title>
+      <a-list :data-source="articles" bordered>
+        <template #renderItem="{ item }">
+          <a-list-item>
+            <a>{{ item.title }}</a>
+          </a-list-item>
+        </template>
+      </a-list>
+    </a-card>
 
     <!-- 热门宠物区块 -->
-    <Card customClass="mb-8">
-      <h3 class="text-xl font-bold text-green-800 mb-4">热门宠物</h3>
-      <ul>
-        <li v-for="c in cats" :key="c.id" class="py-2 border-b last:border-b-0 border-green-50 text-green-700 hover:bg-green-50 px-2 cursor-pointer">
-          {{ c.name }}<span v-if="c.breed">（{{ c.breed }}）</span>
-        </li>
-      </ul>
-    </Card>
+    <a-card class="mb-8">
+      <a-typography-title level="3" style="color:#047857;">热门宠物</a-typography-title>
+      <a-list :data-source="cats" bordered>
+        <template #renderItem="{ item }">
+          <a-list-item>
+            <a>{{ item.name }}<span v-if="item.breed">（{{ item.breed }}）</span></a>
+          </a-list-item>
+        </template>
+      </a-list>
+    </a-card>
 
-    <!-- 预留：服务、社区、百科、个人中心等区块 -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-      <Card>
-        <h3 class="text-xl font-bold text-orange-800 mb-4">服务优势（示例）</h3>
-        <div class="text-gray-600">这里可以展示企业服务、云计算、安全等核心能力。</div>
-      </Card>
-      <Card>
-        <h3 class="text-xl font-bold text-purple-800 mb-4">社区互动（示例）</h3>
-        <div class="text-gray-600">这里可以展示社区热门话题、讨论等。</div>
-      </Card>
-    </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-      <Card>
-        <h3 class="text-xl font-bold text-blue-800 mb-4">百科精选（示例）</h3>
-        <div class="text-gray-600">这里可以展示百科词条、知识库等。</div>
-      </Card>
-      <Card>
-        <h3 class="text-xl font-bold text-green-800 mb-4">个人中心（示例）</h3>
-        <div class="text-gray-600">这里可以展示个人信息、统计、兴趣等。</div>
-      </Card>
-    </div>
+    <!-- 其他区块 -->
+    <a-row gutter="16">
+      <a-col :span="12">
+        <a-card>
+          <a-typography-title level="3" style="color:#ea580c;">服务优势（示例）</a-typography-title>
+          <div style="color:#666;">这里可以展示企业服务、云计算、安全等核心能力。</div>
+        </a-card>
+      </a-col>
+      <a-col :span="12">
+        <a-card>
+          <a-typography-title level="3" style="color:#7c3aed;">社区互动（示例）</a-typography-title>
+          <div style="color:#666;">这里可以展示社区热门话题、讨论等。</div>
+        </a-card>
+      </a-col>
+    </a-row>
+    <a-row gutter="16" class="mt-4">
+      <a-col :span="12">
+        <a-card>
+          <a-typography-title level="3" style="color:#1e40af;">百科精选（示例）</a-typography-title>
+          <div style="color:#666;">这里可以展示百科词条、知识库等。</div>
+        </a-card>
+      </a-col>
+      <a-col :span="12">
+        <a-card>
+          <a-typography-title level="3" style="color:#047857;">个人中心（示例）</a-typography-title>
+          <div style="color:#666;">这里可以展示个人信息、统计、兴趣等。</div>
+        </a-card>
+      </a-col>
+    </a-row>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from '../utils/axios'
-import Card from './ui/Card.vue'
-import Button from './ui/Button.vue'
 
 const articles = ref([])
 const cats = ref([])
@@ -65,11 +77,11 @@ const cats = ref([])
 const loadHomeArticles = async () => {
   try {
     const res = await axios.get('/articles')
-    articles.value = (res.data || []).slice(0, 5)
+    articles.value = (res || []).slice(0, 5)
   } catch {}
   try {
     const res = await axios.get('/cats')
-    cats.value = (res.data || []).slice(0, 5)
+    cats.value = (res || []).slice(0, 5)
   } catch {}
 }
 
@@ -77,3 +89,14 @@ onMounted(() => {
   loadHomeArticles()
 })
 </script>
+
+<style scoped>
+.banner-card {
+  min-height: 220px;
+  display: flex;
+  align-items: center;
+  padding-left: 48px;
+  background: linear-gradient(90deg, #1e3a8a 0%, #3b82f6 100%) !important;
+}
+.mt-4 { margin-top: 16px; }
+</style>

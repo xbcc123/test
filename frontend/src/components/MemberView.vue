@@ -42,7 +42,7 @@ const loadMember = async () => {
   if (!username) return
   try {
     const res = await axios.get(`/users/${username}`)
-    user.value = res.data
+    user.value = res
     edit.value.nickname = user.value.nickname || ''
     edit.value.email = user.value.email || ''
     edit.value.phone = user.value.phone || ''
@@ -53,7 +53,7 @@ const loadMember = async () => {
   }
   try {
     const res = await axios.get(`/users/${username}/favorites`)
-    favorites.value = res.data || []
+    favorites.value = res || []
   } catch {}
 }
 

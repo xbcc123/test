@@ -22,6 +22,12 @@
     <div v-show="currentTab==='member'">
       <MemberAdminPanel />
     </div>
+    <div v-show="currentTab==='petsale'">
+      <PetSaleAdminPanel />
+    </div>
+    <div v-show="currentTab==='petdisease'">
+      <PetDiseaseAdminPanel />
+    </div>
     <!-- 其他管理模块可扩展 -->
   </div>
 </template>
@@ -34,6 +40,8 @@ import EncyclopediaAdminPanel from './admin/EncyclopediaAdminPanel.vue'
 import CommunityAdminPanel from './admin/CommunityAdminPanel.vue'
 import ServiceAdminPanel from './admin/ServiceAdminPanel.vue'
 import MemberAdminPanel from './admin/MemberAdminPanel.vue'
+import PetSaleAdminPanel from './admin/PetSaleAdminPanel.vue'
+import PetDiseaseAdminPanel from './admin/PetDiseaseAdminPanel.vue'
 
 const tabs = [
   { key: 'cat', label: '猫管理' },
@@ -42,6 +50,8 @@ const tabs = [
   { key: 'community', label: '社区互动管理' },
   { key: 'service', label: '服务与资源管理' },
   { key: 'member', label: '会员中心管理' },
+  { key: 'petsale', label: '宠物出售管理' },
+  { key: 'petdisease', label: '宠物疾病管理' },
 ]
 const currentTab = ref('cat')
 </script>

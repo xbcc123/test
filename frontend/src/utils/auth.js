@@ -8,4 +8,15 @@ export function setToken(token) {
 export function removeToken() {
   localStorage.removeItem('token')
 }
-
+export function getUserId() {
+  return localStorage.getItem('userId') || ''
+}
+export function getRole() {
+  return localStorage.getItem('role') || ''
+}
+export function getNickname() {
+  return localStorage.getItem('nickname') || ''
+}
+export function getUsername() {
+  return localStorage.getItem('username') || ''
+}

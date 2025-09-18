@@ -26,8 +26,13 @@ public class AuthController {
         User validUser = userService.validateUser(user.getUsername(), user.getPassword());
         if (validUser != null) {
             String token = jwtUtil.generateToken(validUser.getUsername());
-            Map<String, String> result = new HashMap<>();
+            Map<String, Object> result = new HashMap<>();
             result.put("token", token);
+            result.put("userId", validUser.getId());
+            result.put("username", validUser.getUsername());
+            result.put("role", validUser.getRole());
+            result.put("nickname", validUser.getNickname());
+            // 可根据 User 实体补充更多字段
             return ResponseEntity.ok(result);
         } else {
             Map<String, String> result = new HashMap<>();

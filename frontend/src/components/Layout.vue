@@ -1,7 +1,7 @@
 <template>
   <div class="main-layout">
     <MainMenu />
-    <div class="main-content blue-glass-bg">
+    <div class="main-content blue-glass-bg shadow-xl rounded-2xl mt-6">
       <slot />
     </div>
   </div>

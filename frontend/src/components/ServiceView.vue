@@ -1,6 +1,11 @@
 <template>
   <section class="max-w-3xl mx-auto py-10">
     <h2 class="text-3xl font-bold text-blue-900 mb-6">服务与资源</h2>
+    <div class="mb-6 flex justify-end">
+      <router-link to="/service-order">
+        <button class="order-btn">预约上门看病</button>
+      </router-link>
+    </div>
     <Card customClass="p-6">
       <div v-if="error" class="text-red-500 text-sm mb-4">{{ error }}</div>
       <b class="text-blue-700">宠物医院：</b>
@@ -31,10 +36,28 @@ const loadHospitals = async () => {
   error.value = ''
   try {
     const res = await axios.get('/hospitals')
-    hospitals.value = res.data || []
+    hospitals.value = res || []
   } catch (e) {
     error.value = '加载失败'
   }
 }
 onMounted(loadHospitals)
 </script>
+
+<style>
+.order-btn {
+  background-color: #3b82f6;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.order-btn:hover {
+  background-color: #2563eb;
+}
+</style>

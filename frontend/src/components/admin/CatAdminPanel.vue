@@ -73,7 +73,7 @@ const form = ref({ id: '', name: '', age: '', breed: '', gender: '', weight: '',
 function loadCats() {
   error.value = ''
   axios.get('/cats').then(res => {
-    cats.value = res.data || []
+    cats.value = res || []
   }).catch(() => { error.value = '加载失败' })
 }
 function saveCat() {

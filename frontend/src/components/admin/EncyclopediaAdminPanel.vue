@@ -46,7 +46,7 @@ const form = ref({ id: '', title: '', type: '', content: '' })
 function loadEncyclopedias() {
   error.value = ''
   axios.get('/encyclopedias').then(res => {
-    encyclopedias.value = res.data || []
+    encyclopedias.value = res || []
   }).catch(() => { error.value = '加载失败' })
 }
 function saveEncyclopedia() {
@@ -84,4 +84,3 @@ th { background: #f0f0f0; }
 .error { color: #d00; margin-bottom: 12px; }
 button { margin-right: 6px; }
 </style>
-

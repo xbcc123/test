@@ -26,7 +26,7 @@ const loadEncyclopedias = async () => {
   error.value = ''
   try {
     const res = await axios.get('/encyclopedias')
-    encyclopedias.value = res.data || []
+    encyclopedias.value = res || []
   } catch (e) {
     error.value = '加载失败'
   }

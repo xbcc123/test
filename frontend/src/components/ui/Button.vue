@@ -2,7 +2,8 @@
   <button
     :class="[
       'btn',
-      variant === 'primary' ? 'btn-primary' : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
+      variant === 'primary' ? 'bg-blue-500 text-white hover:bg-blue-600 active:scale-95 transition-all duration-150 shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300 active:scale-95 transition-all duration-150 shadow',
+      'rounded-lg px-4 py-2 font-medium focus:outline-none focus:ring-2 focus:ring-blue-300',
       loading ? 'opacity-60 cursor-not-allowed' : '',
       block ? 'w-full' : '',
       customClass
@@ -27,3 +28,8 @@ const props = defineProps({
 defineEmits(['click']);
 </script>
 
+<style scoped>
+.btn {
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+</style>

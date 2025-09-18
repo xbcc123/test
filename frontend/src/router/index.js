@@ -12,6 +12,9 @@ import AdminView from '../components/AdminView.vue'
 import ServiceDetailView from '../components/ServiceDetailView.vue'
 import CommunityDetailView from '../components/CommunityDetailView.vue'
 import EncyclopediaDetailView from '../components/EncyclopediaDetailView.vue'
+import ServiceOrderView from '../components/ServiceOrderView.vue'
+import PetDiseaseView from '../components/PetDiseaseView.vue'
+import CatShopView from '../components/CatShopView.vue'
 import { getToken } from '../utils/auth'
 
 const routes = [
@@ -27,6 +30,9 @@ const routes = [
   { path: '/service', component: ServiceView },
   { path: '/service/:id', component: ServiceDetailView },
   { path: '/admin', component: AdminView },
+  { path: '/service-order', component: ServiceOrderView },
+  { path: '/pet-disease', component: PetDiseaseView },
+  { path: '/cat-shop', component: CatShopView },
 ]
 
 const router = createRouter({

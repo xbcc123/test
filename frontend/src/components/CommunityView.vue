@@ -7,7 +7,7 @@
         <Button @click="showPostForm = !showPostForm">{{ showPostForm ? '收起' : '发帖' }}</Button>
       </div>
       <form v-if="showPostForm" class="space-y-3 mb-4" @submit.prevent="submitPost">
-        <textarea v-model="newPost.content" placeholder="说点什么..." required class="w-full border rounded-lg p-3 min-h-[60px] focus:ring-2 focus:ring-blue-400"></textarea>
+        <textarea v-model="newPost.content" placeholder="���点什么..." required class="w-full border rounded-lg p-3 min-h-[60px] focus:ring-2 focus:ring-blue-400"></textarea>
         <select v-model="newPost.type" class="w-full border rounded-lg p-2">
           <option value="">请选择类型</option>
           <option value="经验">经验</option>
@@ -27,7 +27,10 @@
             <span class="text-xs text-blue-500">[{{ p.type }}]</span>
             <span class="text-gray-700 mt-1">{{ p.content.slice(0, 30) }}...</span>
           </div>
-          <Button variant="secondary" @click="deletePost(p.id)">删除</Button>
+          <div class="flex items-center gap-2">
+            <LikeButton :postId="p.id" />
+            <Button variant="secondary" @click="deletePost(p.id)">删除</Button>
+          </div>
         </li>
       </ul>
       <div v-else class="text-gray-400">暂无数据</div>
@@ -46,6 +49,7 @@ import axios from '../utils/axios'
 import Card from './ui/Card.vue'
 import Input from './ui/Input.vue'
 import Button from './ui/Button.vue'
+import LikeButton from './ui/LikeButton.vue'
 
 const posts = ref([])
 const error = ref('')
@@ -67,8 +71,8 @@ const loadPosts = async () => {
     } else {
       res = await axios.get('/posts/page', { params: { page: page.value, size: size.value } })
     }
-    posts.value = res.data.content || []
-    totalPages.value = res.data.totalPages || 1
+    posts.value = res.content || []
+    totalPages.value = res.totalPages || 1
   } catch (e) {
     error.value = '加载失败'
   } finally {

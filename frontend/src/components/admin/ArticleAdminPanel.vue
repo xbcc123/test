@@ -46,7 +46,7 @@ const form = ref({ id: '', title: '', category: '', content: '' })
 function loadArticles() {
   error.value = ''
   axios.get('/articles').then(res => {
-    articles.value = res.data || []
+    articles.value = res || []
   }).catch(() => { error.value = '加载失败' })
 }
 function saveArticle() {

@@ -9,10 +9,7 @@
     <div class="community-detail-content">{{ post.content }}</div>
     <!-- 点赞区 -->
     <div class="like-section">
-      <button @click="toggleLike" :disabled="likeLoading">
-        {{ liked ? '取消点赞' : '点赞' }}
-      </button>
-      <span>点赞数：{{ likeCount }}</span>
+      <LikeButton :postId="post.id" />
     </div>
     <!-- 评论区 -->
     <div class="comment-section">
@@ -42,15 +39,11 @@
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from '../utils/axios'
+import LikeButton from './ui/LikeButton.vue'
 
 const route = useRoute()
 const post = ref(null)
 const error = ref('')
-
-// 点赞相关
-const likeCount = ref(0)
-const liked = ref(false)
-const likeLoading = ref(false)
 
 // 评论相关
 const comments = ref([])
@@ -73,40 +66,10 @@ const loadPost = async () => {
   error.value = ''
   try {
     const res = await axios.get(`/posts/${route.params.id}`)
-    post.value = res.data
+    post.value = res
     if (!post.value) error.value = '未找到帖子'
   } catch (e) {
     error.value = '加载失败'
-  }
-}
-
-const loadLike = async () => {
-  likeLoading.value = true
-  try {
-    const res = await axios.get('/likes/count', { params: { postId: route.params.id } })
-    likeCount.value = res.data.count || 0
-    const check = await axios.get('/likes/check', { params: { postId: route.params.id } })
-    liked.value = !!check.data.liked
-  } catch (e) {
-    // 忽略错误
-  } finally {
-    likeLoading.value = false
-  }
-}
-
-const toggleLike = async () => {
-  likeLoading.value = true
-  try {
-    if (liked.value) {
-      await axios.delete('/likes', { params: { postId: route.params.id } })
-    } else {
-      await axios.post('/likes', { postId: route.params.id })
-    }
-    await loadLike()
-  } catch (e) {
-    // 忽略错误
-  } finally {
-    likeLoading.value = false
   }
 }
 
@@ -115,14 +78,14 @@ const loadComments = async () => {
   commentError.value = ''
   try {
     const res = await axios.get('/comments', { params: { postId: route.params.id } })
-    comments.value = res.data || []
+    comments.value = res || []
     // 批量获取所有评论用户信息
     const usernames = Array.from(new Set(comments.value.map(c => c.username).filter(Boolean)))
     const map = {}
     await Promise.all(usernames.map(async uname => {
       try {
         const ures = await axios.get(`/users/${uname}`)
-        map[uname] = ures.data
+        map[uname] = ures
       } catch {}
     }))
     userMap.value = map
@@ -156,7 +119,6 @@ const deleteComment = async (id) => {
 
 onMounted(() => {
   loadPost()
-  loadLike()
   loadComments()
 })
 </script>
@@ -190,9 +152,6 @@ onMounted(() => {
 }
 .like-section {
   margin-bottom: 18px;
-}
-.like-section button {
-  margin-right: 12px;
 }
 .comment-section {
   margin-top: 24px;

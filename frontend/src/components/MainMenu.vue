@@ -21,11 +21,29 @@
     <a-menu-item key="admin">
       <router-link to="/admin">后台管理</router-link>
     </a-menu-item>
+    <a-menu-item key="pet-disease">
+      <router-link to="/pet-disease">宠物疾病</router-link>
+    </a-menu-item>
+    <a-menu-item key="cat-shop">
+      <router-link to="/cat-shop">宠物买卖</router-link>
+    </a-menu-item>
+    <a-menu-item key="logout" style="float:right;margin-left:auto;">
+      <a-button type="link" @click="logout" style="color:#d00;font-weight:bold;">退出登录</a-button>
+    </a-menu-item>
   </a-menu>
 </template>
 
 <script setup>
-// 菜单无业务逻辑，仅展示
+import { useRouter } from 'vue-router'
+import { removeToken } from '../utils/auth'
+
+const router = useRouter()
+function logout() {
+  // 清空所有 localStorage
+  localStorage.clear()
+  removeToken()
+  router.push('/login')
+}
 </script>
 
 <style scoped>

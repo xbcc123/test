@@ -46,7 +46,7 @@ const form = ref({ id: '', userId: '', type: '', content: '' })
 function loadPosts() {
   error.value = ''
   axios.get('/posts').then(res => {
-    posts.value = res.data || []
+    posts.value = res || []
   }).catch(() => { error.value = '加载失败' })
 }
 function savePost() {

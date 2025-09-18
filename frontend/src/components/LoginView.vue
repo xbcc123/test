@@ -1,51 +1,71 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-white">
-    <Card customClass="w-full max-w-md p-8">
+  <div class="login-bg">
+    <a-card class="login-card">
       <div class="flex flex-col items-center mb-6">
         <img src="/favicon.ico" class="w-12 h-12 mb-2" alt="logo" />
-        <h2 class="text-2xl font-bold text-blue-900">欢迎登录宠物之家</h2>
+        <a-typography-title level="2" style="color:#1e40af;">欢迎登录宠物之家</a-typography-title>
       </div>
-      <div v-if="error" class="text-red-500 text-sm mb-4">{{ error }}</div>
-      <form @submit.prevent="login" class="space-y-4">
-        <Input v-model="username" placeholder="用户名" />
-        <Input v-model="password" type="password" placeholder="密码" />
-        <Button block :loading="loading" type="submit">登录</Button>
-      </form>
+      <a-alert v-if="error" type="error" :message="error" show-icon style="margin-bottom: 16px;" />
+      <a-form @submit.prevent="login" layout="vertical">
+        <a-form-item label="用户名" required>
+          <a-input v-model:value="username" placeholder="用户名" />
+        </a-form-item>
+        <a-form-item label="密码" required>
+          <a-input v-model:value="password" type="password" placeholder="密码" />
+        </a-form-item>
+        <a-form-item>
+          <a-button type="primary" html-type="submit" :loading="loading" block>登录</a-button>
+        </a-form-item>
+      </a-form>
       <div class="flex justify-between mt-6 text-sm text-blue-600">
         <a href="#" @click.prevent="showRegister = true">注册</a>
         <a href="#" @click.prevent="showReset = true">找回密码</a>
       </div>
-    </Card>
+    </a-card>
     <!-- 注册弹窗 -->
-    <Modal :visible="showRegister" @close="showRegister = false">
-      <h3 class="text-xl font-bold mb-4">注册账号</h3>
-      <div v-if="registerError" class="text-red-500 text-sm mb-2">{{ registerError }}</div>
-      <form @submit.prevent="register" class="space-y-3">
-        <Input v-model="reg.username" placeholder="用户名" required />
-        <Input v-model="reg.password" type="password" placeholder="密码" required />
-        <Input v-model="reg.confirm" type="password" placeholder="确认密码" required />
-        <Input v-model="reg.nickname" placeholder="昵称" />
-        <Input v-model="reg.email" placeholder="邮箱" />
-        <Input v-model="reg.phone" placeholder="手机号" />
-        <div class="flex gap-2 mt-2">
-          <Button type="submit" block>注册</Button>
-          <Button variant="secondary" type="button" block @click="showRegister = false">取消</Button>
-        </div>
-      </form>
-    </Modal>
+    <a-modal v-model:open="showRegister" title="注册账号" @cancel="showRegister = false" ok-button-props="{ style: { display: 'none' } }" cancel-text="关闭">
+      <a-alert v-if="registerError" type="error" :message="registerError" show-icon style="margin-bottom: 12px;" />
+      <a-form @submit.prevent="register" layout="vertical">
+        <a-form-item label="用户名" required>
+          <a-input v-model:value="reg.username" placeholder="用户名" />
+        </a-form-item>
+        <a-form-item label="密码" required>
+          <a-input v-model:value="reg.password" type="password" placeholder="密码" />
+        </a-form-item>
+        <a-form-item label="确认密码" required>
+          <a-input v-model:value="reg.confirm" type="password" placeholder="确认密码" />
+        </a-form-item>
+        <a-form-item label="昵称">
+          <a-input v-model:value="reg.nickname" placeholder="昵称" />
+        </a-form-item>
+        <a-form-item label="邮箱">
+          <a-input v-model:value="reg.email" placeholder="邮箱" />
+        </a-form-item>
+        <a-form-item label="手机号">
+          <a-input v-model:value="reg.phone" placeholder="手机号" />
+        </a-form-item>
+        <a-form-item>
+          <a-button type="primary" html-type="submit" block>注册</a-button>
+          <a-button style="margin-top:8px;" block @click="showRegister = false">取消</a-button>
+        </a-form-item>
+      </a-form>
+    </a-modal>
     <!-- 找回密码弹窗 -->
-    <Modal :visible="showReset" @close="showReset = false">
-      <h3 class="text-xl font-bold mb-4">找回密码</h3>
-      <div v-if="resetError" class="text-red-500 text-sm mb-2">{{ resetError }}</div>
-      <form @submit.prevent="resetPassword" class="space-y-3">
-        <Input v-model="reset.username" placeholder="用户名" required />
-        <Input v-model="reset.newPassword" type="password" placeholder="新密码" required />
-        <div class="flex gap-2 mt-2">
-          <Button type="submit" block>重置密码</Button>
-          <Button variant="secondary" type="button" block @click="showReset = false">取消</Button>
-        </div>
-      </form>
-    </Modal>
+    <a-modal v-model:open="showReset" title="找回密码" @cancel="showReset = false" ok-button-props="{ style: { display: 'none' } }" cancel-text="关闭">
+      <a-alert v-if="resetError" type="error" :message="resetError" show-icon style="margin-bottom: 12px;" />
+      <a-form @submit.prevent="resetPassword" layout="vertical">
+        <a-form-item label="用户名" required>
+          <a-input v-model:value="reset.username" placeholder="用户名" />
+        </a-form-item>
+        <a-form-item label="新密码" required>
+          <a-input v-model:value="reset.newPassword" type="password" placeholder="新密码" />
+        </a-form-item>
+        <a-form-item>
+          <a-button type="primary" html-type="submit" block>重置密码</a-button>
+          <a-button style="margin-top:8px;" block @click="showReset = false">取消</a-button>
+        </a-form-item>
+      </a-form>
+    </a-modal>
   </div>
 </template>
 
@@ -54,10 +74,6 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { setToken } from '../utils/auth'
 import axios from '../utils/axios'
-import Card from './ui/Card.vue'
-import Input from './ui/Input.vue'
-import Button from './ui/Button.vue'
-import Modal from './ui/Modal.vue'
 
 const username = ref('')
 const password = ref('')
@@ -77,12 +93,17 @@ const login = async () => {
   loading.value = true
   try {
     const res = await axios.post('/login', { username: username.value, password: password.value })
-    if (res.data && res.data.token) {
-      setToken(res.data.token)
-      localStorage.setItem('username', username.value)
+    console.log(res)
+    if (res && res.token) {
+      setToken(res.token)
+      // 缓存用户信息
+      if (res.userId) localStorage.setItem('userId', res.userId)
+      if (res.username) localStorage.setItem('username', res.username)
+      if (res.role) localStorage.setItem('role', res.role)
+      if (res.nickname) localStorage.setItem('nickname', res.nickname)
       router.push('/')
     } else {
-      error.value = res.data.error || '登录失败'
+      error.value = res.error || '登录失败'
     }
   } catch (e) {
     error.value = '网络错误'
@@ -127,4 +148,16 @@ const resetPassword = async () => {
 </script>
 
 <style scoped>
+.login-bg {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #eff6ff 0%, #fff 100%);
+}
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 32px 24px;
+}
 </style>

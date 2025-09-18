@@ -18,6 +18,10 @@ public class Article {
     @Column(updatable = false)
     private LocalDateTime createTime;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id")
+    private User author;
+
     // getter/setter
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -29,5 +33,6 @@ public class Article {
     public void setCategory(String category) { this.category = category; }
     public LocalDateTime getCreateTime() { return createTime; }
     public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
+    public User getAuthor() { return author; }
+    public void setAuthor(User author) { this.author = author; }
 }
-

@@ -7,6 +7,9 @@
       <span v-if="article.createTime"> | 发布时间：{{ formatDate(article.createTime) }}</span>
     </div>
     <div class="article-detail-content">{{ article.content }}</div>
+    <div class="like-section">
+      <LikeButton :postId="article.id" />
+    </div>
   </section>
   <div v-else class="error">{{ error || '未找到资讯' }}</div>
 </template>
@@ -15,6 +18,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from '../utils/axios'
+import LikeButton from './ui/LikeButton.vue'
 
 const route = useRoute()
 const article = ref(null)
@@ -29,7 +33,7 @@ const loadArticle = async () => {
   error.value = ''
   try {
     const res = await axios.get(`/articles/${route.params.id}`)
-    article.value = res.data
+    article.value = res
     if (!article.value) error.value = '未找到资讯'
   } catch (e) {
     error.value = '加载失败'
@@ -69,5 +73,10 @@ onMounted(loadArticle)
   margin: 32px auto;
   text-align: center;
 }
+.like-section {
+  margin-top: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
 </style>
-

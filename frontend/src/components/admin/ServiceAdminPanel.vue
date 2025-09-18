@@ -54,7 +54,7 @@ const form = ref({ id: '', name: '', address: '', phone: '', rating: '', descrip
 function loadHospitals() {
   error.value = ''
   axios.get('/hospitals').then(res => {
-    hospitals.value = res.data || []
+    hospitals.value = res || []
   }).catch(() => { error.value = '加载失败' })
 }
 function saveHospital() {
@@ -92,4 +92,3 @@ th { background: #f0f0f0; }
 .error { color: #d00; margin-bottom: 12px; }
 button { margin-right: 6px; }
 </style>
-

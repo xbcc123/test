@@ -27,7 +27,7 @@ const loadEncyclopedia = async () => {
   error.value = ''
   try {
     const res = await axios.get(`/encyclopedias/${route.params.id}`)
-    encyclopedia.value = res.data
+    encyclopedia.value = res
     if (!encyclopedia.value) error.value = '未找到百科内容'
   } catch (e) {
     error.value = '加载失败'

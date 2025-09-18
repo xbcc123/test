@@ -30,7 +30,7 @@ const loadHospital = async () => {
   error.value = ''
   try {
     const res = await axios.get(`/hospitals/${route.params.id}`)
-    hospital.value = res.data
+    hospital.value = res
     if (!hospital.value) error.value = '未找到医院信息'
   } catch (e) {
     error.value = '加载失败'

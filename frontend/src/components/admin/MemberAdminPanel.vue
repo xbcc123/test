@@ -96,8 +96,8 @@ const resetPwd = ref('')
 function loadUsers() {
   error.value = ''
   axios.get('/users', { params: { page: page.value, size: size.value, keyword: keyword.value } }).then(res => {
-    users.value = res.data.content || []
-    totalPages.value = res.data.totalPages || 1
+    users.value = res.content || []
+    totalPages.value = res.totalPages || 1
   }).catch(() => { error.value = '加载失败' })
 }
 function searchUsers() {
