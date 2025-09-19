@@ -30,9 +30,13 @@ const routes = [
   { path: '/service', component: ServiceView },
   { path: '/service/:id', component: ServiceDetailView },
   { path: '/admin', component: AdminView },
+  { path: '/admin/user-manage', component: () => import('../components/admin/UserManageView.vue') },
+  { path: '/admin/role-manage', component: () => import('../components/admin/RoleManageView.vue') },
+  { path: '/admin/permission-manage', component: () => import('../components/admin/PermissionManageView.vue') },
   { path: '/service-order', component: ServiceOrderView },
   { path: '/pet-disease', component: PetDiseaseView },
   { path: '/cat-shop', component: CatShopView },
+  { path: '/system-monitor', component: () => import('../components/admin/SystemMonitor.vue') },
 ]
 
 const router = createRouter({

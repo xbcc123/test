@@ -23,10 +23,10 @@
           <a-input v-model:value="addForm.imgUrl" placeholder="图片链接（可选）" />
         </a-form-item>
         <a-form-item label="状态">
-          <a-input v-model:value="addForm.status" placeholder="出售状态" />
-        </a-form-item>
-        <a-form-item label="卖家ID" required>
-          <a-input v-model:value="addForm.sellerId" placeholder="请输入卖家ID" />
+          <a-select v-model:value="addForm.status" placeholder="请选择状态">
+            <a-select-option value="在售">在售</a-select-option>
+            <a-select-option value="下架">下架</a-select-option>
+          </a-select>
         </a-form-item>
       </a-form>
     </a-modal>
@@ -86,14 +86,14 @@ const deletePet = async (id) => {
 }
 
 const showAdd = ref(false)
-const addForm = ref({ name: '', type: '', age: '', price: '', description: '', imgUrl: '', status: '', sellerId: '' })
+const addForm = ref({ name: '', type: '', age: '', price: '', description: '', imgUrl: '', status: '在售' })
 
 const handleAdd = async () => {
   try {
     await axios.post('/api/pet-sale', addForm.value)
     message.success('新增成功')
     showAdd.value = false
-    addForm.value = { name: '', type: '', age: '', price: '', description: '', imgUrl: '', status: '', sellerId: '' }
+    addForm.value = { name: '', type: '', age: '', price: '', description: '', imgUrl: '', status: '在售' }
     loadPets()
   } catch (e) {
     message.error('新增失败')

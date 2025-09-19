@@ -12,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.data.redis.core.RedisTemplate;
+import java.util.concurrent.TimeUnit;
 import java.util.List;
 
 @RestController
@@ -20,6 +22,9 @@ import java.util.List;
 public class PostController {
     @Autowired
     private PostRepository postRepository;
+
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
 
     @GetMapping
     @Operation(summary = "获取所有帖子", description = "获取所有帖子列表")
@@ -30,7 +35,16 @@ public class PostController {
     @GetMapping("/{id}")
     @Operation(summary = "根据ID获取帖子", description = "根据ID获取单个帖子详情")
     public Post getById(@PathVariable Long id) {
-        return postRepository.findById(id).orElse(null);
+        String redisKey = "post:" + id;
+        Post post = (Post) redisTemplate.opsForValue().get(redisKey);
+        if (post != null) {
+            return post;
+        }
+        post = postRepository.findById(id).orElse(null);
+        if (post != null) {
+            redisTemplate.opsForValue().set(redisKey, post, 10, TimeUnit.MINUTES);
+        }
+        return post;
     }
 
     @PostMapping
@@ -38,14 +52,22 @@ public class PostController {
     public Post create(@RequestBody Post post, @AuthenticationPrincipal CustomUserDetails userDetails) {
         post.setUserId(userDetails.getUserId());
         post.setUsername(userDetails.getUsername());
-        return postRepository.save(post);
+        Post saved = postRepository.save(post);
+        // 新建帖子时写入缓存
+        String redisKey = "post:" + saved.getId();
+        redisTemplate.opsForValue().set(redisKey, saved, 10, TimeUnit.MINUTES);
+        return saved;
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "更新帖子", description = "根据ID更新帖子内容")
     public Post update(@PathVariable Long id, @RequestBody Post post) {
         post.setId(id);
-        return postRepository.save(post);
+        Post saved = postRepository.save(post);
+        // 更新帖子时刷新缓存
+        String redisKey = "post:" + saved.getId();
+        redisTemplate.opsForValue().set(redisKey, saved, 10, TimeUnit.MINUTES);
+        return saved;
     }
 
     @DeleteMapping("/{id}")

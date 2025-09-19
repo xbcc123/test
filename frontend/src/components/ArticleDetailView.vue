@@ -34,11 +34,11 @@ const loadArticle = async () => {
   try {
     const res = await axios.get(`/articles/${route.params.id}`)
     article.value = res
-    if (!article.value) error.value = '未找到资讯'
   } catch (e) {
     error.value = '加载失败'
   }
 }
+
 onMounted(loadArticle)
 </script>
 

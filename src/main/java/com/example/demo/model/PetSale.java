@@ -21,6 +21,7 @@ public class PetSale {
     private String imgUrl;
     private String status; // 在售/下架/已售
     private Long sellerId; // 卖家用户ID
+    private String sellerName; // 卖家名称
     @Column(name = "create_time")
     private LocalDateTime createTime;
     @Column(name = "update_time")
@@ -44,9 +45,10 @@ public class PetSale {
     public void setStatus(String status) { this.status = status; }
     public Long getSellerId() { return sellerId; }
     public void setSellerId(Long sellerId) { this.sellerId = sellerId; }
+    public String getSellerName() { return sellerName; }
+    public void setSellerName(String sellerName) { this.sellerName = sellerName; }
     public LocalDateTime getCreateTime() { return createTime; }
     public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
     public LocalDateTime getUpdateTime() { return updateTime; }
     public void setUpdateTime(LocalDateTime updateTime) { this.updateTime = updateTime; }
 }
-

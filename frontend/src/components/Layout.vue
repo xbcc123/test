@@ -17,7 +17,7 @@ import MainMenu from './MainMenu.vue'
   background: linear-gradient(135deg, #eaf6fb 0%, #c9e7fa 100%);
 }
 .main-content {
-  max-width: 900px;
+  max-width: 1300px;
   margin: 0 auto;
   padding: 32px 16px 16px 16px;
 }

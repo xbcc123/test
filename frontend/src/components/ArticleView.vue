@@ -1,32 +1,38 @@
 <template>
   <section class="article-section">
-    <a-typography-title level="2">资讯中心</a-typography-title>
-    <a-alert v-if="error" type="error" :message="error" show-icon style="margin-bottom: 16px;" />
-    <a-collapse accordion>
-      <a-collapse-panel v-for="(list, category) in groupedArticles" :key="category" :header="`${category}（共${list.length}条）`">
-        <a-list :data-source="list" bordered>
-          <template #renderItem="{ item }">
-            <a-list-item style="display:flex;align-items:center;justify-content:space-between;">
-              <div>
-                <a :href="`#/articles/${item.id}`"><b>{{ item.title }}</b></a>
-                <span v-if="item.createTime" class="article-time" style="margin-left:8px;color:#888;">{{ formatDate(item.createTime) }}</span>
+    <h2 class="article-title">资讯中心</h2>
+    <div v-if="error" class="error-msg">{{ error }}</div>
+    <div v-for="(list, category) in groupedArticles" :key="category" class="article-category-block">
+      <h3 class="category-title">{{ category }}（共{{ list.length }}条）</h3>
+      <div class="article-card-list">
+        <Card v-for="item in list" :key="item.id" class="article-card">
+          <div class="article-card-content">
+            <div v-if="item.imgUrl" class="article-card-img-wrapper">
+              <img :src="item.imgUrl" alt="封面" class="article-card-img" />
+            </div>
+            <div class="article-card-info">
+              <a :href="`#/articles/${item.id}`" class="article-card-title">{{ item.title }}</a>
+              <div class="article-card-meta">
+                <span>{{ item.category }}</span>
+                <span v-if="item.createTime"> | {{ formatDate(item.createTime) }}</span>
               </div>
-              <LikeButton :postId="item.id" />
-            </a-list-item>
-          </template>
-        </a-list>
-      </a-collapse-panel>
-    </a-collapse>
+              <div class="article-card-desc">{{ item.content ? item.content.slice(0, 80) + (item.content.length > 80 ? '...' : '') : '' }}</div>
+              <div class="article-card-actions">
+                <LikeButton :postId="item.id" />
+              </div>
+            </div>
+          </div>
+        </Card>
+      </div>
+    </div>
   </section>
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import axios from '../utils/axios'
-import { Alert as AAlert, Collapse as ACollapse, CollapsePanel as ACollapsePanel, List as AList, Typography } from 'ant-design-vue'
+import Card from './ui/Card.vue'
 import LikeButton from './ui/LikeButton.vue'
-
-const { Title } = Typography
 
 const articles = ref([])
 const error = ref('')
@@ -59,6 +65,65 @@ const groupedArticles = computed(() => {
 </script>
 
 <style scoped>
-.article-section { padding: 20px; }
-.article-time { font-size: 13px; }
+.article-section { padding: 24px; }
+.article-title { font-size: 2em; margin-bottom: 18px; }
+.error-msg { color: #d00; margin-bottom: 16px; }
+.category-title { font-size: 1.2em; margin: 24px 0 12px 0; color: #1565c0; }
+.article-card-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.article-card {
+  width: 350px;
+  min-height: 160px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.article-card-content {
+  display: flex;
+  gap: 16px;
+}
+.article-card-img-wrapper {
+  flex-shrink: 0;
+}
+.article-card-img {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #eee;
+}
+.article-card-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.article-card-title {
+  font-size: 1.1em;
+  font-weight: bold;
+  color: #1565c0;
+  text-decoration: none;
+}
+.article-card-title:hover { text-decoration: underline; }
+.article-card-meta {
+  color: #888;
+  font-size: 13px;
+}
+.article-card-desc {
+  color: #444;
+  font-size: 15px;
+  margin: 4px 0 0 0;
+  line-height: 1.5;
+}
+.article-card-actions {
+  margin-top: 8px;
+}
+@media (max-width: 800px) {
+  .article-card-list { flex-direction: column; gap: 16px; }
+  .article-card { width: 100%; }
+  .article-card-content { flex-direction: row; }
+}
 </style>

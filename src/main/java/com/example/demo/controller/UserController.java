@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.model.Role;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.UserService;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 @Tag(name = "用户接口", description = "用户相关操作")
 public class UserController {
     @Autowired
@@ -35,11 +36,11 @@ public class UserController {
         result.put("avatar", user.getAvatar());
         result.put("email", user.getEmail());
         result.put("phone", user.getPhone());
-        result.put("role", user.getRole());
         result.put("score", user.getScore());
         result.put("favorites", user.getFavorites());
         result.put("status", user.getStatus());
         result.put("likeCount", userService.getUserLikeCount(user.getId()));
+        result.put("roles", user.getRoles());
         return result;
     }
 
@@ -123,6 +124,13 @@ public class UserController {
         if (user == null) return null;
         user.setPassword(newPassword);
         return userRepository.save(user);
+    }
+
+    @PutMapping("/{userId}/roles")
+    @Operation(summary = "分配角色", description = "为用户分配角色")
+    public Map<String, Object> assignRoles(@PathVariable Long userId, @RequestBody Set<Long> roleIds) {
+        boolean success = userService.assignRoles(userId, roleIds);
+        return Map.of("success", success);
     }
 
 }

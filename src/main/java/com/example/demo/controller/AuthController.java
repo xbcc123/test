@@ -1,11 +1,16 @@
 package com.example.demo.controller;
 
+import com.example.demo.model.LoginLog;
 import com.example.demo.model.User;
 import com.example.demo.service.JwtUtil;
 import com.example.demo.service.UserService;
+import com.example.demo.repository.LoginLogRepository;
+import com.example.demo.service.OnlineUserService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.HttpServletRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,22 +24,57 @@ public class AuthController {
     private UserService userService;
     @Autowired
     private JwtUtil jwtUtil;
+    @Autowired
+    private LoginLogRepository loginLogRepository;
+    @Autowired
+    private OnlineUserService onlineUserService;
 
     @PostMapping("/login")
     @Operation(summary = "用户登录", description = "用户登录并返回JWT Token")
-    public ResponseEntity<?> login(@RequestBody User user) {
-        User validUser = userService.validateUser(user.getUsername(), user.getPassword());
+    public ResponseEntity<?> login(@RequestBody Map<String, Object> req, HttpServletRequest request) {
+        String username = (String) req.get("username");
+        String password = (String) req.get("password");
+        String captcha = (String) req.get("captcha");
+        String uuid = (String) req.get("uuid");
+        String ip = request.getRemoteAddr();
+        if (!CaptchaController.validateCaptcha(uuid, captcha)) {
+            LoginLog log = new LoginLog();
+            log.setUsername(username);
+            log.setIp(ip);
+            log.setTime(java.time.LocalDateTime.now());
+            log.setSuccess(false);
+            log.setMessage("验证码错误");
+            loginLogRepository.save(log);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "验证码错误"));
+        }
+        User validUser = userService.validateUser(username, password);
         if (validUser != null) {
-            String token = jwtUtil.generateToken(validUser.getUsername());
+            String token = jwtUtil.generateToken(validUser.getId(), validUser.getUsername());
+            onlineUserService.online(String.valueOf(validUser.getId()), validUser.getUsername());
             Map<String, Object> result = new HashMap<>();
             result.put("token", token);
             result.put("userId", validUser.getId());
             result.put("username", validUser.getUsername());
-            result.put("role", validUser.getRole());
+            result.put("roles", validUser.getRoles());
             result.put("nickname", validUser.getNickname());
-            // 可根据 User 实体补充更多字段
+            // 登录成功日志
+            LoginLog log = new LoginLog();
+            log.setUsername(username);
+            log.setIp(ip);
+            log.setTime(java.time.LocalDateTime.now());
+            log.setSuccess(true);
+            log.setMessage("登录成功");
+            loginLogRepository.save(log);
             return ResponseEntity.ok(result);
         } else {
+            // 登录失败日志
+            LoginLog log = new LoginLog();
+            log.setUsername(username);
+            log.setIp(ip);
+            log.setTime(java.time.LocalDateTime.now());
+            log.setSuccess(false);
+            log.setMessage("用户名或密码错误");
+            loginLogRepository.save(log);
             Map<String, String> result = new HashMap<>();
             result.put("error", "用户名或密码错误");
             return ResponseEntity.status(401).body(result);

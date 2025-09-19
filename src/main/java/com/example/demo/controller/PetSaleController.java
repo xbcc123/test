@@ -5,6 +5,9 @@ import com.example.demo.service.PetSaleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import com.example.demo.model.CustomUserDetails;
 
 @RestController
 @RequestMapping("/api/pet-sale")
@@ -34,6 +37,12 @@ public class PetSaleController {
 
     @PostMapping("")
     public boolean add(@RequestBody PetSale petSale) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            petSale.setSellerId(userDetails.getUserId());
+            petSale.setSellerName(userDetails.getUsername());
+        }
         return petSaleService.add(petSale);
     }
 
@@ -53,4 +62,3 @@ public class PetSaleController {
         return petSaleService.setStatus(id, status);
     }
 }
-

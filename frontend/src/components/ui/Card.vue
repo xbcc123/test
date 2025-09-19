@@ -1,5 +1,5 @@
 <template>
-  <div :class="['card', 'rounded-xl shadow-lg bg-white p-6 transition-shadow duration-150 hover:shadow-2xl', customClass]">
+  <div :class="['card', customClass]">
     <slot />
   </div>
 </template>
@@ -13,6 +13,16 @@ const props = defineProps({
 
 <style scoped>
 .card {
-  transition: box-shadow 0.15s;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  background: #fff;
+  border: 1.5px solid var(--color-border);
+  padding: 1.5rem 1.2rem;
+  transition: box-shadow 0.18s, border 0.18s, background 0.18s;
+}
+.card:hover {
+  box-shadow: var(--shadow-hover);
+  border-color: var(--color-primary);
+  background: #f6faff;
 }
 </style>

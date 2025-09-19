@@ -13,6 +13,12 @@
         <a-form-item label="密码" required>
           <a-input v-model:value="password" type="password" placeholder="密码" />
         </a-form-item>
+        <a-form-item label="验证码" required>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <a-input v-model:value="captcha" placeholder="请输入验证码" style="flex:1;" />
+            <img :src="captchaImg" @click="refreshCaptcha" style="height:40px;cursor:pointer;border-radius:4px;" :alt="'点击刷新验证码'" />
+          </div>
+        </a-form-item>
         <a-form-item>
           <a-button type="primary" html-type="submit" :loading="loading" block>登录</a-button>
         </a-form-item>
@@ -70,7 +76,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { setToken } from '../utils/auth'
 import axios from '../utils/axios'
@@ -87,12 +93,29 @@ const registerError = ref('')
 const resetError = ref('')
 const reg = ref({ username: '', password: '', confirm: '', nickname: '', email: '', phone: '' })
 const reset = ref({ username: '', newPassword: '' })
+const captcha = ref('')
+const captchaImg = ref('')
+const uuid = ref('')
+
+const refreshCaptcha = async () => {
+  const res = await axios.get('/api/auth/captcha')
+  captchaImg.value = res.img
+  uuid.value = res.uuid
+  captcha.value = ''
+}
+
+onMounted(refreshCaptcha)
 
 const login = async () => {
   error.value = ''
   loading.value = true
   try {
-    const res = await axios.post('/login', { username: username.value, password: password.value })
+    const res = await axios.post('/login', {
+      username: username.value,
+      password: password.value,
+      captcha: captcha.value,
+      uuid: uuid.value
+    })
     console.log(res)
     if (res && res.token) {
       setToken(res.token)
@@ -104,9 +127,11 @@ const login = async () => {
       router.push('/')
     } else {
       error.value = res.error || '登录失败'
+      refreshCaptcha()
     }
   } catch (e) {
-    error.value = '网络错误'
+    error.value = e.response?.data?.error || '网络错误'
+    refreshCaptcha()
   } finally {
     loading.value = false
   }

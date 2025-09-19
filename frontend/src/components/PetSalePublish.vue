@@ -20,8 +20,11 @@
       <a-form-item label="图片URL" name="imgUrl">
         <a-input v-model:value="form.imgUrl" placeholder="可选，图片链接" />
       </a-form-item>
-      <a-form-item label="卖家ID" name="sellerId" :rules="[{ required: true, message: '请输入卖家ID' }]">
-        <a-input-number v-model:value="form.sellerId" :min="1" style="width:100%" />
+      <a-form-item label="状态" name="status" :rules="[{ required: true, message: '新增宠物出售\n' }]">
+        <a-select v-model:value="form.status" placeholder="请选择状态">
+          <a-select-option value="在售">在售</a-select-option>
+          <a-select-option value="下架">下架</a-select-option>
+        </a-select>
       </a-form-item>
       <a-form-item>
         <a-button type="primary" html-type="submit">发布</a-button>
@@ -46,14 +49,13 @@ const form = ref({
   price: 0,
   description: '',
   imgUrl: '',
-  sellerId: ''
+  status: '在售'
 })
 const rules = {
   name: [{ required: true, message: '请输入名称' }],
   type: [{ required: true, message: '请输入类型' }],
   age: [{ required: true, message: '请输入年龄' }],
   price: [{ required: true, message: '请输入价格' }],
-  sellerId: [{ required: true, message: '请输入卖家ID' }]
 }
 
 const submit = async () => {
