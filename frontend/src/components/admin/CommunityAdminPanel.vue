@@ -1,37 +1,39 @@
 <template>
   <div>
-    <div class="error" v-if="error">{{ error }}</div>
-    <form @submit.prevent="savePost">
-      <input type="hidden" v-model="form.id">
-      <div class="form-group">
-        <label>用户ID</label>
-        <input v-model="form.userId" required />
-      </div>
-      <div class="form-group">
-        <label>类型</label>
-        <input v-model="form.type" required />
-      </div>
-      <div class="form-group">
-        <label>内容</label>
-        <textarea v-model="form.content" required></textarea>
-      </div>
-      <button type="submit">{{form.id ? '保存' : '新增'}}</button>
-      <button type="button" @click="resetForm">重置</button>
-    </form>
-    <table class="admin-table">
-      <thead>
-        <tr><th>ID</th><th>用户ID</th><th>类型</th><th>内容</th><th>操作</th></tr>
-      </thead>
-      <tbody>
-        <tr v-for="p in posts" :key="p.id">
-          <td>{{p.id}}</td><td>{{p.userId}}</td><td>{{p.type}}</td><td>{{p.content}}</td>
-          <td>
-            <button @click="editPost(p)">编辑</button>
-            <button @click="deletePost(p.id)">删除</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <a-alert v-if="error" type="error" :message="error" show-icon class="mb-4" />
+    <a-form
+      :model="form"
+      layout="inline"
+      @finish="savePost"
+      class="mb-4 bg-white p-4 rounded shadow"
+    >
+      <a-form-item label="用户ID" name="userId" :rules="[{ required: true, message: '请输入用户ID' }]">
+        <a-input v-model:value="form.userId" style="width:120px" />
+      </a-form-item>
+      <a-form-item label="类型" name="type" :rules="[{ required: true, message: '请输入类型' }]">
+        <a-input v-model:value="form.type" style="width:100px" />
+      </a-form-item>
+      <a-form-item label="内容" name="content" :rules="[{ required: true, message: '请输入内容' }]">
+        <a-input v-model:value="form.content" style="width:220px" />
+      </a-form-item>
+      <a-form-item>
+        <a-button type="primary" html-type="submit">{{form.id ? '保存' : '新增'}}</a-button>
+        <a-button style="margin-left:8px" @click="resetForm">重置</a-button>
+      </a-form-item>
+    </a-form>
+    <a-table :columns="columns" :data-source="posts" row-key="id" bordered :pagination="false">
+      <template #bodyCell="{ column, record }">
+        <template v-if="column.key === 'action'">
+          <a-button type="link" @click="editPost(record)">编辑</a-button>
+          <a-popconfirm title="确定要删除吗？" @confirm="deletePost(record.id)">
+            <a-button type="link" danger>删除</a-button>
+          </a-popconfirm>
+        </template>
+        <template v-else>
+          {{ record[column.dataIndex] }}
+        </template>
+      </template>
+    </a-table>
   </div>
 </template>
 
@@ -42,6 +44,14 @@ import axios from '@/utils/axios'
 const posts = ref([])
 const error = ref('')
 const form = ref({ id: '', userId: '', type: '', content: '' })
+
+const columns = [
+  { title: 'ID', dataIndex: 'id', key: 'id' },
+  { title: '用户ID', dataIndex: 'userId', key: 'userId' },
+  { title: '类型', dataIndex: 'type', key: 'type' },
+  { title: '内容', dataIndex: 'content', key: 'content' },
+  { title: '操作', key: 'action' },
+]
 
 function loadPosts() {
   error.value = ''
@@ -66,7 +76,6 @@ function resetForm() {
   form.value = { id: '', userId: '', type: '', content: '' }
 }
 function deletePost(id) {
-  if (!confirm('确定要删除这条社区互动吗？')) return
   axios.delete(`/posts/${id}`).then(() => {
     loadPosts()
   }).catch(() => { error.value = '删除失败' })
@@ -75,13 +84,5 @@ onMounted(loadPosts)
 </script>
 
 <style scoped>
-.form-group { margin-bottom: 16px; }
-label { display: block; margin-bottom: 4px; }
-input, textarea { width: 100%; padding: 8px; box-sizing: border-box; }
-.admin-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
-th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-th { background: #f0f0f0; }
-.error { color: #d00; margin-bottom: 12px; }
-button { margin-right: 6px; }
+.mb-4 { margin-bottom: 16px; }
 </style>
-

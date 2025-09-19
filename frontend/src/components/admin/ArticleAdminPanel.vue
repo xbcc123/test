@@ -1,37 +1,39 @@
 <template>
   <div>
-    <div class="error" v-if="error">{{ error }}</div>
-    <form @submit.prevent="saveArticle">
-      <input type="hidden" v-model="form.id">
-      <div class="form-group">
-        <label>标题</label>
-        <input v-model="form.title" required />
-      </div>
-      <div class="form-group">
-        <label>分类</label>
-        <input v-model="form.category" required />
-      </div>
-      <div class="form-group">
-        <label>内容</label>
-        <textarea v-model="form.content" required></textarea>
-      </div>
-      <button type="submit">{{form.id ? '保存' : '新增'}}</button>
-      <button type="button" @click="resetForm">重置</button>
-    </form>
-    <table class="admin-table">
-      <thead>
-        <tr><th>ID</th><th>标题</th><th>分类</th><th>内容</th><th>操作</th></tr>
-      </thead>
-      <tbody>
-        <tr v-for="a in articles" :key="a.id">
-          <td>{{a.id}}</td><td>{{a.title}}</td><td>{{a.category}}</td><td>{{a.content}}</td>
-          <td>
-            <button @click="editArticle(a)">编辑</button>
-            <button @click="deleteArticle(a.id)">删除</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <a-alert v-if="error" type="error" :message="error" show-icon class="mb-4" />
+    <a-form
+      :model="form"
+      layout="inline"
+      @finish="saveArticle"
+      class="mb-4 bg-white p-4 rounded shadow"
+    >
+      <a-form-item label="标题" name="title" :rules="[{ required: true, message: '请输入标题' }]">
+        <a-input v-model:value="form.title" style="width:160px" />
+      </a-form-item>
+      <a-form-item label="分类" name="category" :rules="[{ required: true, message: '请输入分类' }]">
+        <a-input v-model:value="form.category" style="width:120px" />
+      </a-form-item>
+      <a-form-item label="内容" name="content" :rules="[{ required: true, message: '请输入内容' }]">
+        <a-input v-model:value="form.content" style="width:220px" />
+      </a-form-item>
+      <a-form-item>
+        <a-button type="primary" html-type="submit">{{form.id ? '保存' : '新增'}}</a-button>
+        <a-button style="margin-left:8px" @click="resetForm">重置</a-button>
+      </a-form-item>
+    </a-form>
+    <a-table :columns="columns" :data-source="articles" row-key="id" bordered :pagination="false">
+      <template #bodyCell="{ column, record }">
+        <template v-if="column.key === 'action'">
+          <a-button type="link" @click="editArticle(record)">编辑</a-button>
+          <a-popconfirm title="确定要删除吗？" @confirm="deleteArticle(record.id)">
+            <a-button type="link" danger>删除</a-button>
+          </a-popconfirm>
+        </template>
+        <template v-else>
+          {{ record[column.dataIndex] }}
+        </template>
+      </template>
+    </a-table>
   </div>
 </template>
 
@@ -42,6 +44,14 @@ import axios from '../../utils/axios'
 const articles = ref([])
 const error = ref('')
 const form = ref({ id: '', title: '', category: '', content: '' })
+
+const columns = [
+  { title: 'ID', dataIndex: 'id', key: 'id' },
+  { title: '标题', dataIndex: 'title', key: 'title' },
+  { title: '分类', dataIndex: 'category', key: 'category' },
+  { title: '内容', dataIndex: 'content', key: 'content' },
+  { title: '操作', key: 'action' },
+]
 
 function loadArticles() {
   error.value = ''
@@ -66,7 +76,6 @@ function resetForm() {
   form.value = { id: '', title: '', category: '', content: '' }
 }
 function deleteArticle(id) {
-  if (!confirm('确定要删除这篇文章吗？')) return
   axios.delete(`/articles/${id}`).then(() => {
     loadArticles()
   }).catch(() => { error.value = '删除失败' })
@@ -75,13 +84,5 @@ onMounted(loadArticles)
 </script>
 
 <style scoped>
-.form-group { margin-bottom: 16px; }
-label { display: block; margin-bottom: 4px; }
-input, textarea { width: 100%; padding: 8px; box-sizing: border-box; }
-.admin-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
-th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-th { background: #f0f0f0; }
-.error { color: #d00; margin-bottom: 12px; }
-button { margin-right: 6px; }
+.mb-4 { margin-bottom: 16px; }
 </style>
-
