@@ -76,12 +76,8 @@ const fetchOrders = async () => {
 const cancelOrder = async (id) => {
   try {
     const res = await axios.put(`/api/service-orders/${id}/cancel`);
-    if (res.code === 0) {
-      message.success('取消成功');
-      fetchOrders();
-    } else {
-      message.error(res.msg || '取消失败');
-    }
+    message.success('取消成功');
+    fetchOrders();
   } catch (e) {
     message.error('取消失败');
   }

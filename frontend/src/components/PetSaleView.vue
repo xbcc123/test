@@ -2,39 +2,47 @@
   <section class="petsale-section">
     <h2 class="petsale-title">宠物出售信息</h2>
     <a-button type="primary" @click="goPublish" style="margin-bottom: 16px;">发布宠物</a-button>
-    <a-table :columns="columns" :data-source="pets" rowKey="id" bordered :pagination="false">
-      <template #bodyCell="{ column, record }">
-        <template v-if="column.dataIndex === 'imgUrl'">
-          <img v-if="record.imgUrl" :src="record.imgUrl" alt="pet image" style="max-width:60px;max-height:60px;object-fit:cover;" />
-        </template>
-        <template v-else>
-          {{ record[column.dataIndex] }}
-        </template>
-      </template>
-    </a-table>
+    <div class="pet-card-list">
+      <a-card
+        v-for="pet in pets"
+        :key="pet.id"
+        class="pet-card"
+        hoverable
+        @click="openDetail(pet)"
+        :cover="pet.imgUrl ? $createElement('img', { attrs: { src: pet.imgUrl, alt: 'pet', style: 'width:100%;height:180px;object-fit:cover;' } }) : null"
+      >
+        <a-card-meta
+          :title="pet.name + '（' + pet.type + '）'"
+          :description="'￥' + pet.price + ' | ' + (pet.status || '在售')"
+        />
+        <div class="pet-card-desc">{{ pet.description?.slice(0, 30) + (pet.description?.length > 30 ? '...' : '') }}</div>
+      </a-card>
+    </div>
+    <a-modal v-model:open="showDetail" title="宠物详情" :footer="null" width="520px">
+      <div v-if="currentPet">
+        <img v-if="currentPet.imgUrl" :src="currentPet.imgUrl" alt="pet" style="width:100%;max-height:220px;object-fit:cover;margin-bottom:12px;" />
+        <h3>{{ currentPet.name }}（{{ currentPet.type }}）</h3>
+        <p><b>年龄：</b>{{ currentPet.age }}</p>
+        <p><b>价格：</b>￥{{ currentPet.price }}</p>
+        <p><b>状态：</b>{{ currentPet.status }}</p>
+        <p><b>卖家ID：</b>{{ currentPet.sellerId }}</p>
+        <p><b>描述：</b>{{ currentPet.description }}</p>
+      </div>
+    </a-modal>
   </section>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, h, getCurrentInstance } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from '../utils/axios'
 import { message } from 'ant-design-vue'
 
 const pets = ref([])
 const router = useRouter()
-
-const columns = [
-  { title: 'ID', dataIndex: 'id' },
-  { title: '名称', dataIndex: 'name' },
-  { title: '类型', dataIndex: 'type' },
-  { title: '年龄', dataIndex: 'age' },
-  { title: '价格', dataIndex: 'price' },
-  { title: '描述', dataIndex: 'description' },
-  { title: '图片', dataIndex: 'imgUrl' },
-  { title: '状态', dataIndex: 'status' },
-  { title: '卖家ID', dataIndex: 'sellerId' },
-]
+const showDetail = ref(false)
+const currentPet = ref(null)
+const { appContext } = getCurrentInstance()
 
 const loadPets = async () => {
   try {
@@ -49,10 +57,35 @@ const goPublish = () => {
   router.push('/pet-sale/publish')
 }
 
+const openDetail = (pet) => {
+  currentPet.value = pet
+  showDetail.value = true
+}
+
 onMounted(loadPets)
 </script>
 
 <style scoped>
 .petsale-section { padding: 20px; }
-.petsale-title { font-size: 1.5em; margin-bottom: 10px; }
+.petsale-title { margin-bottom: 10px; }
+.pet-card-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+.pet-card {
+  width: 260px;
+  margin-bottom: 0;
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+.pet-card:hover {
+  box-shadow: 0 4px 16px #b3e5fc;
+}
+.pet-card-desc {
+  color: #888;
+  font-size: 13px;
+  margin-top: 8px;
+}
 </style>

@@ -2,7 +2,7 @@
   <button
     :class="[
       'btn',
-      variant === 'primary' ? 'bg-blue-500 text-white hover:bg-blue-600 active:scale-95 transition-all duration-150 shadow-md' : 'bg-gray-200 text-gray-700 hover:bg-gray-300 active:scale-95 transition-all duration-150 shadow',
+       variant === 'primary' ? 'btn-primary' : 'bg-gray-200 text-gray-700 hover:bg-gray-300 active:scale-95 transition-all duration-150 shadow',
       'rounded-lg px-4 py-2 font-medium focus:outline-none focus:ring-2 focus:ring-blue-300',
       loading ? 'opacity-60 cursor-not-allowed' : '',
       block ? 'w-full' : '',
@@ -30,6 +30,22 @@ defineEmits(['click']);
 
 <style scoped>
 .btn {
-  transition: box-shadow 0.15s, transform 0.15s;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.15s, transform 0.15s, background 0.2s, color 0.2s;
+}
+.btn:active {
+  transform: scale(0.97);
+  box-shadow: var(--shadow-hover);
+}
+.btn-primary {
+  background: linear-gradient(90deg, #ff9800 0%, #ffb74d 100%);
+  color: #fff;
+  box-shadow: var(--shadow-card);
+}
+.btn-primary:hover {
+  background: linear-gradient(90deg, #fb8c00 0%, #ffa726 100%);
+  color: #fff;
+  box-shadow: var(--shadow-hover);
 }
 </style>

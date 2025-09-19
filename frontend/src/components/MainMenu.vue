@@ -52,6 +52,7 @@ function logout() {
   border-radius: 14px 14px 0 0;
   overflow: hidden;
   box-shadow: 0 2px 12px 0 rgba(33,150,243,0.08);
+  font-size: 1.08em;
 }
 .blue-menu {
   background: linear-gradient(90deg, #b6d0f7 0%, #eaf6fb 100%) !important;
@@ -62,15 +63,30 @@ function logout() {
   background: linear-gradient(90deg, #2196f3 0%, #90caf9 100%) !important;
   color: #fff !important;
   box-shadow: 0 2px 8px 0 rgba(33,150,243,0.10);
+  border-radius: 10px 10px 0 0;
 }
 .main-menu :deep(.ant-menu-item) {
   font-weight: bold;
   font-size: 16px;
   color: #1976d2;
-  transition: background 0.2s, color 0.2s;
+  transition: background 0.2s, color 0.2s, border-radius 0.2s;
+  margin: 0 2px;
+  border-radius: 10px 10px 0 0;
+  padding: 0 18px;
 }
 .main-menu :deep(.ant-menu-item):hover {
   background: #e3f2fd !important;
   color: #1565c0 !important;
+}
+@media (max-width: 900px) {
+  .main-menu {
+    font-size: 0.98em;
+    border-radius: 0;
+    margin-bottom: 12px;
+  }
+  .main-menu :deep(.ant-menu-item) {
+    padding: 0 10px;
+    font-size: 15px;
+  }
 }
 </style>

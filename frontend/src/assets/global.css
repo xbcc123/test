@@ -1,14 +1,38 @@
 /* 其它全局样式可继续补充 */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@400;700&display=swap');@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@400;700&display=swap');
 @import "tailwindcss";
 
+:root {
+  --color-primary: #1565c0;
+  --color-accent: #ff9800;
+  --color-success: #22c55e;
+  --color-danger: #ef4444;
+  --color-warning: #f59e42;
+  --color-info: #3b82f6;
+  --color-bg: #f0f5ff;
+  --color-bg-light: #f9fbfd;
+  --color-bg-dark: #e3eaf6;
+  --color-text: #2c3e50;
+  --color-text-light: #6b7280;
+  --color-border: #e3e3e3;
+  --color-border-dark: #b6b6b6;
+  --radius-lg: 18px;
+  --radius-md: 12px;
+  --radius-sm: 6px;
+  --shadow-card: 0 2px 12px 0 rgba(33,150,243,0.08);
+  --shadow-hover: 0 4px 24px 0 rgba(33,150,243,0.12);
+  --transition-main: 0.18s cubic-bezier(.4,0,.2,1);
+}
 
 /* 全局基础样式 */
 html, body {
-  font-family: 'Noto Serif SC', serif;
-  background: linear-gradient(135deg, #f0f5ff 0%, #f9fbfd 100%);
-  color: #2c3e50;
+  font-family: 'Noto Serif SC', 'Noto Sans SC', Arial, sans-serif;
+  background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-bg-light) 100%);
+  color: var(--color-text);
+  font-size: 17px;
+  line-height: 1.7;
   scroll-behavior: smooth;
+  letter-spacing: 0.01em;
 }
 
 .hide-scrollbar::-webkit-scrollbar { display: none; }
@@ -16,17 +40,98 @@ html, body {
 
 /* 统一按钮、卡片、输入框等基础样式（可被 Tailwind 覆盖） */
 .btn {
-  @apply px-8 py-3 rounded-lg font-semibold transition-all uppercase tracking-wide;
+  @apply px-8 py-3 rounded-lg font-semibold transition-all uppercase tracking-wide shadow-md;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+  transition: box-shadow var(--transition-main), background var(--transition-main), color var(--transition-main), transform var(--transition-main);
 }
 .btn-primary {
   @apply bg-gradient-to-r from-orange-500 to-orange-400 text-white shadow-lg hover:from-orange-600 hover:to-orange-500;
 }
+.btn-success { background: var(--color-success); color: #fff; }
+.btn-danger { background: var(--color-danger); color: #fff; }
+.btn-warning { background: var(--color-warning); color: #fff; }
+.btn-info { background: var(--color-info); color: #fff; }
+.btn[disabled], .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
 .card {
   @apply bg-white rounded-2xl shadow-md hover:shadow-xl transition-all;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  border: 1.5px solid var(--color-border);
+  transition: box-shadow var(--transition-main), border var(--transition-main), background var(--transition-main);
 }
+.card-title { font-size: 1.15em; font-weight: bold; margin-bottom: 0.5em; color: var(--color-primary); }
+.card-divider { height: 1px; background: var(--color-border); margin: 16px 0; border-radius: 1px; }
+
 input, textarea {
   @apply border border-gray-200 rounded-lg px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all;
+  font-size: 1rem;
+  background: #fff;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--color-border);
+  transition: border var(--transition-main), box-shadow var(--transition-main);
+}
+input:focus, textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(33,150,243,0.10);
+}
+input[disabled], textarea[disabled] {
+  background: #f3f4f6;
+  color: #aaa;
+}
+input::placeholder, textarea::placeholder {
+  color: var(--color-text-light);
+  opacity: 0.8;
 }
 
-/* 头部、导航、页脚等可在组件内用 Tailwind 组合 */
+/* 响应式断点优化 */
+@media (max-width: 900px) {
+  html { font-size: 15px; }
+}
+@media (max-width: 600px) {
+  html { font-size: 14px; }
+  .card, .btn { border-radius: var(--radius-md); }
+}
 
+/* 统一分隔线样式 */
+.divider {
+  height: 1px;
+  background: var(--color-border);
+  margin: 24px 0;
+  border-radius: 1px;
+}
+
+/* 统一标题样式 */
+h1, .title-xl { font-size: 2.2em; font-weight: bold; color: var(--color-primary); margin-bottom: 0.7em; }
+h2, .title-lg { font-size: 1.5em; font-weight: bold; color: var(--color-primary); margin-bottom: 0.6em; }
+h3, .title-md { font-size: 1.2em; font-weight: bold; color: var(--color-accent); margin-bottom: 0.5em; }
+
+/* 链接样式 */
+a { color: var(--color-primary); text-decoration: none; transition: color var(--transition-main); }
+a:hover { color: var(--color-accent); text-decoration: underline; }
+
+/* 预留暗色模式变量 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #1a2233;
+    --color-bg-light: #232b3a;
+    --color-bg-dark: #1a2233;
+    --color-text: #e3e3e3;
+    --color-text-light: #b6b6b6;
+    --color-border: #333b4d;
+    --shadow-card: 0 2px 12px 0 rgba(33,150,243,0.18);
+    --shadow-hover: 0 4px 24px 0 rgba(33,150,243,0.22);
+  }
+  html, body {
+    background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-bg-light) 100%);
+    color: var(--color-text);
+  }
+  .card {
+    background: #232b3a;
+    color: #e3e3e3;
+    border: 1.5px solid var(--color-border);
+  }
+}
