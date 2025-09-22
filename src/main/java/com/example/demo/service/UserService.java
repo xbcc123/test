@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.model.User;
+import com.example.demo.model.UserDTO;
 import com.example.demo.model.Role;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.repository.ArticleLikeRepository;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -69,5 +71,23 @@ public class UserService {
         user.setRoles(roles);
         userRepository.save(user);
         return true;
+    }
+
+    public UserDTO userToDTO(User user) {
+        if (user == null) return null;
+        UserDTO dto = new UserDTO();
+        dto.setId(user.getId());
+        dto.setUsername(user.getUsername());
+        dto.setNickname(user.getNickname());
+        dto.setAvatar(user.getAvatar());
+        dto.setEmail(user.getEmail());
+        dto.setPhone(user.getPhone());
+        dto.setStatus(user.getStatus());
+        dto.setScore(user.getScore());
+        dto.setFavorites(user.getFavorites());
+        if (user.getRoles() != null) {
+            dto.setRoleIds(user.getRoles().stream().map(Role::getId).collect(Collectors.toSet()));
+        }
+        return dto;
     }
 }

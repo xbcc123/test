@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.model.Role;
 import com.example.demo.model.User;
+import com.example.demo.model.UserDTO;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,12 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.*;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/users")
 @Tag(name = "用户接口", description = "用户相关操作")
 public class UserController {
     @Autowired
@@ -26,22 +28,13 @@ public class UserController {
 
     @GetMapping("/{username}")
     @Operation(summary = "获取用户", description = "根据用户名获取用户信息")
-    public Map<String, Object> getUser(@PathVariable String username) {
+    public ResponseEntity<UserDTO> getUser(@PathVariable String username) {
         User user = userRepository.findByUsername(username).orElse(null);
-        if (user == null) return null;
-        Map<String, Object> result = new HashMap<>();
-        result.put("id", user.getId());
-        result.put("username", user.getUsername());
-        result.put("nickname", user.getNickname());
-        result.put("avatar", user.getAvatar());
-        result.put("email", user.getEmail());
-        result.put("phone", user.getPhone());
-        result.put("score", user.getScore());
-        result.put("favorites", user.getFavorites());
-        result.put("status", user.getStatus());
-        result.put("likeCount", userService.getUserLikeCount(user.getId()));
-        result.put("roles", user.getRoles());
-        return result;
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        UserDTO dto = userService.userToDTO(user);
+        return ResponseEntity.ok(dto);
     }
 
     @PostMapping("/{username}/favorites")
@@ -85,15 +78,18 @@ public class UserController {
 
     @GetMapping("")
     @Operation(summary = "获取用户列表", description = "获取用户分页列表，可根据关键字搜索")
-    public Page<User> getUsers(@RequestParam(defaultValue = "0") int page,
+    public List<UserDTO> getUsers(@RequestParam(defaultValue = "0") int page,
                               @RequestParam(defaultValue = "10") int size,
                               @RequestParam(required = false) String keyword) {
         Pageable pageable = PageRequest.of(page, size);
+        Page<User> userPage;
         if (keyword != null && !keyword.isEmpty()) {
-            return userRepository.findByUsernameContainingOrNicknameContaining(keyword, keyword, pageable);
+            userPage = userRepository.findByUsernameContainingOrNicknameContaining(keyword, keyword, pageable);
         } else {
-            return userRepository.findAll(pageable);
+            userPage = userRepository.findAll(pageable);
         }
+        List<UserDTO> dtoList = userPage.getContent().stream().map(userService::userToDTO).toList();
+        return dtoList;
     }
 
     @PostMapping("")

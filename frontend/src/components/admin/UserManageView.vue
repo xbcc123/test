@@ -61,7 +61,7 @@ const fetchUsers = async (page = 1, size = 10) => {
   loading.value = true
   try {
     const res = await axios.get('/users', { params: { page: page - 1, size, keyword: searchKeyword.value } })
-    users.value = res.content
+    users.value = res
     pagination.value.total = res.totalElements
     pagination.value.current = page
   } catch (e) {

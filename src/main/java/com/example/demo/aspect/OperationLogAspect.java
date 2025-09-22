@@ -48,7 +48,15 @@ public class OperationLogAspect {
         if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
             ip = request.getRemoteAddr();
         } else {
-            ip = ip.split(",")[0].trim();
+            // 处理多个IP的情况，取第一个非unknown的IP
+            String[] ips = ip.split(",");
+            for (String candidateIp : ips) {
+                candidateIp = candidateIp.trim();
+                if (!"unknown".equalsIgnoreCase(candidateIp)) {
+                    ip = candidateIp;
+                    break;
+                }
+            }
         }
         if ("0:0:0:0:0:0:0:1".equals(ip)) {
             ip = "127.0.0.1";

@@ -1,37 +1,38 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.Permission;
+import com.example.demo.model.PermissionCreateOrUpdateDTO;
+import com.example.demo.model.PermissionDTO;
 import com.example.demo.service.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/permissions")
+@RequestMapping("/permissions")
 public class PermissionController {
     @Autowired
     private PermissionService permissionService;
 
     @GetMapping
-    public List<Permission> getAllPermissions() {
-        return permissionService.findAll();
+    public List<PermissionDTO> getAllPermissions(@RequestParam(required = false) String keyword) {
+        return permissionService.findAllAsTree(keyword);
     }
 
     @GetMapping("/{id}")
-    public Optional<Permission> getPermission(@PathVariable Long id) {
-        return permissionService.findById(id);
+    public PermissionDTO getPermission(@PathVariable Long id) {
+        return permissionService.findDTOById(id);
     }
 
     @PostMapping
-    public Permission createPermission(@RequestBody Permission permission) {
-        return permissionService.save(permission);
+    public Permission createPermission(@RequestBody PermissionCreateOrUpdateDTO dto) {
+        return permissionService.createOrUpdate(dto);
     }
 
     @PutMapping("/{id}")
-    public Permission updatePermission(@PathVariable Long id, @RequestBody Permission permission) {
-        permission.setId(id);
-        return permissionService.save(permission);
+    public Permission updatePermission(@PathVariable Long id, @RequestBody PermissionCreateOrUpdateDTO dto) {
+        dto.setId(id);
+        return permissionService.createOrUpdate(dto);
     }
 
     @DeleteMapping("/{id}")
@@ -39,4 +40,3 @@ public class PermissionController {
         permissionService.deleteById(id);
     }
 }
-
