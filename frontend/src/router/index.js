@@ -16,10 +16,13 @@ import ServiceOrderView from '../components/ServiceOrderView.vue'
 import PetDiseaseView from '../components/PetDiseaseView.vue'
 import CatShopView from '../components/CatShopView.vue'
 import { getToken } from '../utils/auth'
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
+NProgress.configure({ showSpinner: false, speed: 380, trickleSpeed: 120 })
 
 const routes = [
-  { path: '/login', component: LoginView },
-  { path: '/', component: HomeView },
+  { path: '/login', component: LoginView, meta: { title: '登录' } },
+  { path: '/', component: HomeView, meta: { title: '首页' } },
   { path: '/cats', component: CatListView },
   { path: '/articles', component: ArticleView },
   { path: '/articles/:id', component: ArticleDetailView },
@@ -45,6 +48,7 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
+  NProgress.start()
   const publicPages = ['/login']
   const authRequired = !publicPages.includes(to.path)
   const token = getToken()
@@ -53,6 +57,12 @@ router.beforeEach((to, from, next) => {
   } else {
     next()
   }
+})
+router.afterEach((to) => {
+  if (to.meta && to.meta.title) {
+    document.title = to.meta.title + ' - 宠物综合平台'
+  }
+  NProgress.done()
 })
 
 export default router

@@ -1,7 +1,8 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.Role;
-import com.example.demo.model.RoleDTO;
+import com.example.demo.model.dto.RoleCreateOrUpdateDTO;
+import com.example.demo.model.dto.RoleDTO;
 import com.example.demo.service.RoleService;
 
 import java.util.List;
@@ -86,5 +87,13 @@ public class RoleController {
             logger.error("Error deleting role {}: {}", roleId, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Failed to delete role"));
         }
+    }
+
+    @PutMapping("/{roleId}")
+    public ResponseEntity<RoleDTO> updateRole(@PathVariable Long roleId, @RequestBody RoleCreateOrUpdateDTO dto) {
+        dto.setId(roleId);
+        Role updated = roleService.updateRole(dto);
+        if (updated == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        return ResponseEntity.ok(roleService.roleToDTO(updated));
     }
 }

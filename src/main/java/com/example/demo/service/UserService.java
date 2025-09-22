@@ -1,7 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.model.User;
-import com.example.demo.model.UserDTO;
+import com.example.demo.model.dto.UserDTO;
 import com.example.demo.model.Role;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.repository.ArticleLikeRepository;
@@ -28,7 +28,7 @@ public class UserService {
         Optional<User> userOpt = userRepository.findByUsername(username);
         if (userOpt.isPresent() && userOpt.get().getPassword() != null && userOpt.get().getPassword().equals(password)) {
             User user = userOpt.get();
-            user.setPassword(null); // 不返回密码
+//            user.setPassword(null); // 不返回密码
             return user;
         }
         return null;

@@ -1,8 +1,8 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.Permission;
-import com.example.demo.model.PermissionCreateOrUpdateDTO;
-import com.example.demo.model.PermissionDTO;
+import com.example.demo.model.dto.PermissionCreateOrUpdateDTO;
+import com.example.demo.model.dto.PermissionDTO;
 import com.example.demo.service.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

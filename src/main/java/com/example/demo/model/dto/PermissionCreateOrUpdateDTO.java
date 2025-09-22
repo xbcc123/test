@@ -1,13 +1,10 @@
-package com.example.demo.model;
+package com.example.demo.model.dto;
 
-import java.util.List;
-
-public class PermissionDTO {
+public class PermissionCreateOrUpdateDTO {
     private Long id;
     private String name;
     private String description;
     private Long parentId;
-    private List<PermissionDTO> children;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -17,7 +14,5 @@ public class PermissionDTO {
     public void setDescription(String description) { this.description = description; }
     public Long getParentId() { return parentId; }
     public void setParentId(Long parentId) { this.parentId = parentId; }
-    public List<PermissionDTO> getChildren() { return children; }
-    public void setChildren(List<PermissionDTO> children) { this.children = children; }
 }
 

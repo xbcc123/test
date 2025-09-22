@@ -1,5 +1,7 @@
-package com.example.demo.model;
+package com.example.demo.model.dto;
+
 import java.util.Set;
+
 public class RoleDTO {
     private Long id;
     private String name;

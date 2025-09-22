@@ -55,7 +55,7 @@ public class AuthController {
             result.put("token", token);
             result.put("userId", validUser.getId());
             result.put("username", validUser.getUsername());
-            result.put("roles", validUser.getRoles());
+//            result.put("roles", validUser.getRoles());
             result.put("nickname", validUser.getNickname());
             // 登录成功日志
             LoginLog log = new LoginLog();

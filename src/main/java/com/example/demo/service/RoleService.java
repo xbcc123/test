@@ -2,7 +2,8 @@ package com.example.demo.service;
 
 import com.example.demo.model.Permission;
 import com.example.demo.model.Role;
-import com.example.demo.model.RoleDTO;
+import com.example.demo.model.dto.RoleCreateOrUpdateDTO;
+import com.example.demo.model.dto.RoleDTO;
 import com.example.demo.repository.PermissionRepository;
 import com.example.demo.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,5 +84,17 @@ public class RoleService {
             dto.setPermissionIds(role.getPermissions().stream().map(Permission::getId).collect(Collectors.toSet()));
         }
         return dto;
+    }
+
+    public Role updateRole(RoleCreateOrUpdateDTO dto) {
+        Role role = roleRepository.findById(dto.getId()).orElse(null);
+        if (role == null) return null;
+        role.setName(dto.getName());
+        role.setDescription(dto.getDescription());
+        if (dto.getPermissionIds() != null) {
+            Set<Permission> permissions = new java.util.HashSet<>(permissionRepository.findAllById(dto.getPermissionIds()));
+            role.setPermissions(permissions);
+        }
+        return roleRepository.save(role);
     }
 }

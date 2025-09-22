@@ -1,8 +1,8 @@
 package com.example.demo.service;
 
 import com.example.demo.model.Permission;
-import com.example.demo.model.PermissionCreateOrUpdateDTO;
-import com.example.demo.model.PermissionDTO;
+import com.example.demo.model.dto.PermissionCreateOrUpdateDTO;
+import com.example.demo.model.dto.PermissionDTO;
 import com.example.demo.repository.PermissionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
