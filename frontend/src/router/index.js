@@ -36,10 +36,14 @@ const routes = [
   { path: '/admin/user-manage', component: () => import('../components/admin/UserManageView.vue') },
   { path: '/admin/role-manage', component: () => import('../components/admin/RoleManageView.vue') },
   { path: '/admin/permission-manage', component: () => import('../components/admin/PermissionManageView.vue') },
+  { path: '/admin/department-manage', component: () => import('../components/admin/DepartmentManageView.vue') },
+  { path: '/admin/position-manage', component: () => import('../components/admin/PositionManageView.vue') },
   { path: '/service-order', component: ServiceOrderView },
   { path: '/pet-disease', component: PetDiseaseView },
   { path: '/cat-shop', component: CatShopView },
   { path: '/system-monitor', component: () => import('../components/admin/SystemMonitor.vue') },
+  { path: '/announcements', component: () => import('../components/AnnouncementListView.vue'), meta:{ title:'公告'} },
+  { path: '/admin/announcement-manage', component: () => import('../components/admin/AnnouncementManageView.vue') },
 ]
 
 const router = createRouter({

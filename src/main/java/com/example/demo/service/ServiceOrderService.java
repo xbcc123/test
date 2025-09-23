@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.model.ServiceOrder;
 import com.example.demo.model.User;
+import com.example.demo.model.dto.ServiceOrderDTO;
 import com.example.demo.repository.ServiceOrderRepository;
 import com.example.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +18,42 @@ public class ServiceOrderService {
     @Autowired
     private UserRepository userRepository;
 
-    public ServiceOrder createOrder(String username, ServiceOrder order) {
+    public ServiceOrderDTO createOrder(String username, ServiceOrder order) {
         User user = userRepository.findByUsername(username).orElse(null);
         if (user == null) return null;
         order.setUser(user);
         order.setStatus("待处理");
-        return serviceOrderRepository.save(order);
+        ServiceOrder saved = serviceOrderRepository.save(order);
+        return toDTO(saved);
+    }
+
+    public List<ServiceOrderDTO> getUserOrdersDTO(String username) {
+        User user = userRepository.findByUsername(username).orElse(null);
+        if (user == null) return List.of();
+        return serviceOrderRepository.findByUser(user).stream().map(this::toDTO).toList();
+    }
+
+    public Optional<ServiceOrderDTO> getOrderDTO(Long id) {
+        return serviceOrderRepository.findById(id).map(this::toDTO);
+    }
+
+    private ServiceOrderDTO toDTO(ServiceOrder o) {
+        if (o == null) return null;
+        ServiceOrderDTO dto = new ServiceOrderDTO();
+        dto.setId(o.getId());
+        if (o.getUser() != null) {
+            dto.setUserId(o.getUser().getId());
+            dto.setUsername(o.getUser().getUsername());
+        }
+        dto.setPetName(o.getPetName());
+        dto.setPetType(o.getPetType());
+        dto.setServiceTime(o.getServiceTime());
+        dto.setAddress(o.getAddress());
+        dto.setPhone(o.getPhone());
+        dto.setRemark(o.getRemark());
+        dto.setStatus(o.getStatus());
+        dto.setCreateTime(o.getCreateTime());
+        return dto;
     }
 
     public List<ServiceOrder> getUserOrders(String username) {
@@ -57,4 +88,3 @@ public class ServiceOrderService {
         return false;
     }
 }
-

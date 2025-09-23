@@ -39,6 +39,18 @@
     <a-menu-item key="permission-manage">
       <router-link to="/admin/permission-manage">权限管理</router-link>
     </a-menu-item>
+    <a-menu-item key="department-manage">
+      <router-link to="/admin/department-manage">部门管理</router-link>
+    </a-menu-item>
+    <a-menu-item key="position-manage">
+      <router-link to="/admin/position-manage">岗位管理</router-link>
+    </a-menu-item>
+    <a-menu-item key="announcements">
+      <router-link to="/announcements">公告</router-link>
+    </a-menu-item>
+    <a-menu-item key="announcement-manage">
+      <router-link to="/admin/announcement-manage">公告管理</router-link>
+    </a-menu-item>
     <a-menu-item key="logout" style="float:right;margin-left:auto;">
       <a-button type="link" @click="logout" style="color:#d00;font-weight:bold;">退出登录</a-button>
     </a-menu-item>

@@ -16,6 +16,10 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 @RestController
 @RequestMapping("/api/monitor")
@@ -28,6 +32,28 @@ public class MonitorController {
     private LoginLogRepository loginLogRepository;
     @Autowired
     private RedisConnectionFactory redisConnectionFactory;
+
+    // Reuse same patterns as JacksonConfig
+    private static final DateTimeFormatter F_SPACE = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter F_ISO = DateTimeFormatter.ISO_LOCAL_DATE_TIME; // 2025-09-17T11:23:44
+    private static final DateTimeFormatter F_DATE = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter[] INPUT_FORMATS = new DateTimeFormatter[]{F_SPACE, F_ISO, F_DATE};
+
+    private LocalDateTime parseDateTime(String value) {
+        if (value == null) return null;
+        String v = value.trim();
+        if (v.isEmpty()) return null;
+        for (DateTimeFormatter f : INPUT_FORMATS) {
+            try {
+                if (f == F_DATE) {
+                    LocalDate d = LocalDate.parse(v, f);
+                    return d.atStartOfDay();
+                }
+                return LocalDateTime.parse(v, f);
+            } catch (DateTimeParseException ignored) {}
+        }
+        return null; // Silently ignore invalid format; could throw if preferred
+    }
 
     @GetMapping("/online-users")
     public List<Map<String, String>> getOnlineUsers() {
@@ -58,10 +84,12 @@ public class MonitorController {
                 predicates.add(cb.equal(root.get("ip"), ip));
             if (result != null && !result.isEmpty())
                 predicates.add(cb.like(root.get("result"), "%" + result + "%"));
-            if (startTime != null && !startTime.isEmpty())
-                predicates.add(cb.greaterThanOrEqualTo(root.get("time"), java.time.LocalDateTime.parse(startTime)));
-            if (endTime != null && !endTime.isEmpty())
-                predicates.add(cb.lessThanOrEqualTo(root.get("time"), java.time.LocalDateTime.parse(endTime)));
+            LocalDateTime start = parseDateTime(startTime);
+            LocalDateTime end = parseDateTime(endTime);
+            if (start != null)
+                predicates.add(cb.greaterThanOrEqualTo(root.get("time"), start));
+            if (end != null)
+                predicates.add(cb.lessThanOrEqualTo(root.get("time"), end));
             return cb.and(predicates.toArray(new Predicate[0]));
         }, pageable);
     }

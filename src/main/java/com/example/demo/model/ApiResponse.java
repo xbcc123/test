@@ -13,13 +13,12 @@ public class ApiResponse<T> {
         this.data = data;
     }
 
-    public static <T> ApiResponse<T> success(T data) {
-        return new ApiResponse<>(0, "成功", data);
-    }
-
-    public static <T> ApiResponse<T> error(int code, String msg) {
-        return new ApiResponse<>(code, msg, null);
-    }
+    public static <T> ApiResponse<T> success() { return new ApiResponse<>(ErrorCode.SUCCESS.getCode(), ErrorCode.SUCCESS.getDefaultMsg(), null); }
+    public static <T> ApiResponse<T> success(T data, String msg) { return new ApiResponse<>(ErrorCode.SUCCESS.getCode(), msg, data); }
+    public static <T> ApiResponse<T> success(T data) { return new ApiResponse<>(ErrorCode.SUCCESS.getCode(), ErrorCode.SUCCESS.getDefaultMsg(), data); }
+    public static <T> ApiResponse<T> error(ErrorCode ec) { return new ApiResponse<>(ec.getCode(), ec.getDefaultMsg(), null); }
+    public static <T> ApiResponse<T> error(ErrorCode ec, String msg) { return new ApiResponse<>(ec.getCode(), msg, null); }
+    public static <T> ApiResponse<T> error(int code, String msg) { return new ApiResponse<>(code, msg, null); }
 
     public int getCode() { return code; }
     public void setCode(int code) { this.code = code; }
@@ -28,4 +27,3 @@ public class ApiResponse<T> {
     public T getData() { return data; }
     public void setData(T data) { this.data = data; }
 }
-

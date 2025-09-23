@@ -12,7 +12,9 @@ public class UserDTO {
     private String status;
     private Integer score;
     private String favorites;
-    private Set<Long> roleIds;
+    private Set<RoleSimpleDTO> roles;
+    private DepartmentSimpleDTO department;
+    private Set<PositionSimpleDTO> positions;
     // getter/setter
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -32,7 +34,10 @@ public class UserDTO {
     public void setScore(Integer score) { this.score = score; }
     public String getFavorites() { return favorites; }
     public void setFavorites(String favorites) { this.favorites = favorites; }
-    public Set<Long> getRoleIds() { return roleIds; }
-    public void setRoleIds(Set<Long> roleIds) { this.roleIds = roleIds; }
+    public Set<RoleSimpleDTO> getRoles() { return roles; }
+    public void setRoles(Set<RoleSimpleDTO> roles) { this.roles = roles; }
+    public DepartmentSimpleDTO getDepartment() { return department; }
+    public void setDepartment(DepartmentSimpleDTO department) { this.department = department; }
+    public Set<PositionSimpleDTO> getPositions() { return positions; }
+    public void setPositions(Set<PositionSimpleDTO> positions) { this.positions = positions; }
 }
-

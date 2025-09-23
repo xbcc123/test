@@ -5,6 +5,8 @@ import com.example.demo.model.User;
 import com.example.demo.model.dto.UserDTO;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.UserService;
+import com.example.demo.model.ApiResponse;
+import com.example.demo.model.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,12 +107,25 @@ public class UserController {
     }
 
     @PutMapping("/{username}/status")
-    @Operation(summary = "更新用户状态", description = "修改用户的状态")
-    public User updateStatus(@PathVariable String username, @RequestParam String status) {
+    @Operation(summary = "更新用户状态", description = "修改用户的状态，支持 query 参数 或 JSON body {\"status\":\"...\"}")
+    public ResponseEntity<ApiResponse<?>> updateStatus(@PathVariable String username,
+                                                        @RequestParam(value = "status", required = false) String statusParam,
+                                                        @RequestBody(required = false) Map<String, Object> body) {
+        String newStatus = statusParam;
+        if (newStatus == null && body != null) {
+            Object v = body.get("status");
+            if (v != null) newStatus = String.valueOf(v);
+        }
+        if (newStatus == null || newStatus.isBlank()) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(ErrorCode.VALIDATION_ERROR, "缺少 status 参数"));
+        }
         User user = userRepository.findByUsername(username).orElse(null);
-        if (user == null) return null;
-        user.setStatus(status);
-        return userRepository.save(user);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error(ErrorCode.NOT_FOUND, "用户不存在"));
+        }
+        user.setStatus(newStatus);
+        userRepository.save(user);
+        return ResponseEntity.ok(ApiResponse.success(userService.userToDTO(user), "更新成功"));
     }
 
     @PutMapping("/{username}/reset-password")
@@ -127,6 +142,37 @@ public class UserController {
     public Map<String, Object> assignRoles(@PathVariable Long userId, @RequestBody Set<Long> roleIds) {
         boolean success = userService.assignRoles(userId, roleIds);
         return Map.of("success", success);
+    }
+
+    @PutMapping("/{userId}/department")
+    @Operation(summary = "分配部门", description = "为用户设置所属部门，传 null 或不传可清除")
+    public ResponseEntity<ApiResponse<?>> assignDepartment(@PathVariable Long userId,
+                                                           @RequestBody(required = false) Map<String,Object> body,
+                                                           @RequestParam(value = "departmentId", required = false) Long departmentIdParam) {
+        Long deptId = departmentIdParam;
+        if (deptId == null && body != null && body.get("departmentId") != null) {
+            deptId = body.get("departmentId") == null ? null : Long.valueOf(body.get("departmentId").toString());
+        }
+        boolean ok = userService.assignDepartment(userId, deptId);
+        if (!ok) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error(ErrorCode.NOT_FOUND, "用户不存在"));
+        var user = userRepository.findById(userId).orElse(null);
+        return ResponseEntity.ok(ApiResponse.success(userService.userToDTO(user), "部门已更新"));
+    }
+
+    @PutMapping("/{userId}/positions")
+    @Operation(summary = "分配岗位", description = "为用户批量设置岗位，覆盖式更新")
+    public ResponseEntity<ApiResponse<?>> assignPositions(@PathVariable Long userId,
+                                                           @RequestBody(required = false) Map<String,Object> body,
+                                                           @RequestParam(value = "positionIds", required = false) List<Long> positionIdsParam) {
+        java.util.Set<Long> ids = new java.util.HashSet<>();
+        if (positionIdsParam != null) ids.addAll(positionIdsParam);
+        if (body != null && body.get("positionIds") instanceof java.util.Collection<?> c) {
+            for (Object o : c) { if (o != null) ids.add(Long.valueOf(o.toString())); }
+        }
+        boolean ok = userService.assignPositions(userId, ids);
+        if (!ok) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error(ErrorCode.NOT_FOUND, "用户不存在"));
+        var user = userRepository.findById(userId).orElse(null);
+        return ResponseEntity.ok(ApiResponse.success(userService.userToDTO(user), "岗位已更新"));
     }
 
 }

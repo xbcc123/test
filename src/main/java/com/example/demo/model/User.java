@@ -8,6 +8,7 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import java.util.Set;
 
 @Entity
@@ -30,6 +31,16 @@ public class User {
         joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "department_id")
+    private Department department; // 所属部门
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_position",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "position_id"))
+    private Set<Position> positions; // 岗位集合
 
     public User() {}
 
@@ -60,4 +71,8 @@ public class User {
     public void setStatus(String status) { this.status = status; }
     public Set<Role> getRoles() { return roles; }
     public void setRoles(Set<Role> roles) { this.roles = roles; }
+    public Department getDepartment() { return department; }
+    public void setDepartment(Department department) { this.department = department; }
+    public Set<Position> getPositions() { return positions; }
+    public void setPositions(Set<Position> positions) { this.positions = positions; }
 }

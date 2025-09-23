@@ -6,6 +6,13 @@ import com.example.demo.model.Role;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.repository.ArticleLikeRepository;
 import com.example.demo.repository.RoleRepository;
+import com.example.demo.model.dto.RoleSimpleDTO;
+import com.example.demo.model.Department;
+import com.example.demo.model.Position;
+import com.example.demo.repository.DepartmentRepository;
+import com.example.demo.repository.PositionRepository;
+import com.example.demo.model.dto.DepartmentSimpleDTO;
+import com.example.demo.model.dto.PositionSimpleDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +30,12 @@ public class UserService {
 
     @Autowired
     private RoleRepository roleRepository;
+
+    @Autowired
+    private DepartmentRepository departmentRepository;
+
+    @Autowired
+    private PositionRepository positionRepository;
 
     public User validateUser(String username, String password) {
         Optional<User> userOpt = userRepository.findByUsername(username);
@@ -73,6 +86,26 @@ public class UserService {
         return true;
     }
 
+    public boolean assignDepartment(Long userId, Long departmentId) {
+        var userOpt = userRepository.findById(userId);
+        if (userOpt.isEmpty()) return false;
+        User user = userOpt.get();
+        Department dept = departmentId == null ? null : departmentRepository.findById(departmentId).orElse(null);
+        user.setDepartment(dept);
+        userRepository.save(user);
+        return true;
+    }
+
+    public boolean assignPositions(Long userId, Set<Long> positionIds) {
+        var userOpt = userRepository.findById(userId);
+        if (userOpt.isEmpty()) return false;
+        User user = userOpt.get();
+        Set<Position> positions = positionIds == null ? java.util.Collections.emptySet() : new java.util.HashSet<>(positionRepository.findAllById(positionIds));
+        user.setPositions(positions);
+        userRepository.save(user);
+        return true;
+    }
+
     public UserDTO userToDTO(User user) {
         if (user == null) return null;
         UserDTO dto = new UserDTO();
@@ -86,7 +119,22 @@ public class UserService {
         dto.setScore(user.getScore());
         dto.setFavorites(user.getFavorites());
         if (user.getRoles() != null) {
-            dto.setRoleIds(user.getRoles().stream().map(Role::getId).collect(Collectors.toSet()));
+            dto.setRoles(user.getRoles().stream()
+                    .map(r -> new RoleSimpleDTO(r.getId(), r.getName(), r.getDescription()))
+                    .collect(Collectors.toSet()));
+        } else {
+            dto.setRoles(java.util.Collections.emptySet());
+        }
+        if (user.getDepartment() != null) {
+            var d = user.getDepartment();
+            dto.setDepartment(new DepartmentSimpleDTO(d.getId(), d.getName(), d.getCode(), d.getDescription(), d.getParent() == null ? null : d.getParent().getId()));
+        }
+        if (user.getPositions() != null) {
+            dto.setPositions(user.getPositions().stream()
+                    .map(p -> new PositionSimpleDTO(p.getId(), p.getName(), p.getCode(), p.getDescription(), p.getDepartment()==null?null:p.getDepartment().getId()))
+                    .collect(java.util.stream.Collectors.toSet()));
+        } else {
+            dto.setPositions(java.util.Collections.emptySet());
         }
         return dto;
     }

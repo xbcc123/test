@@ -1,40 +1,26 @@
-package com.example.demo.model;
+package com.example.demo.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
-@Entity
-public class ServiceOrder {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class ServiceOrderDTO {
     private Long id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
-
+    private Long userId;
+    private String username;
     private String petName;
     private String petType;
-
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime serviceTime;
     private String address;
     private String phone;
     private String remark;
-
-    // 状态：待处理 / 已完成 / 已取消
     private String status;
-
-    @CreationTimestamp
     private LocalDateTime createTime;
 
-    // getters and setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-    public User getUser() { return user; }
-    public void setUser(User user) { this.user = user; }
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
     public String getPetName() { return petName; }
     public void setPetName(String petName) { this.petName = petName; }
     public String getPetType() { return petType; }
@@ -51,9 +37,5 @@ public class ServiceOrder {
     public void setStatus(String status) { this.status = status; }
     public LocalDateTime getCreateTime() { return createTime; }
     public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
-
-    @PrePersist
-    public void prePersist() {
-        if (this.status == null || this.status.isBlank()) this.status = "待处理"; // default
-    }
 }
+

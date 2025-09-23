@@ -4,6 +4,7 @@ import com.example.demo.model.Permission;
 import com.example.demo.model.Role;
 import com.example.demo.model.dto.RoleCreateOrUpdateDTO;
 import com.example.demo.model.dto.RoleDTO;
+import com.example.demo.model.dto.PermissionSimpleDTO;
 import com.example.demo.repository.PermissionRepository;
 import com.example.demo.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,7 +82,13 @@ public class RoleService {
         dto.setName(role.getName());
         dto.setDescription(role.getDescription());
         if (role.getPermissions() != null) {
-            dto.setPermissionIds(role.getPermissions().stream().map(Permission::getId).collect(Collectors.toSet()));
+            dto.setPermissions(
+                role.getPermissions().stream()
+                    .map(p -> new PermissionSimpleDTO(p.getId(), p.getName(), p.getDescription()))
+                    .collect(Collectors.toSet())
+            );
+        } else {
+            dto.setPermissions(java.util.Collections.emptySet());
         }
         return dto;
     }
