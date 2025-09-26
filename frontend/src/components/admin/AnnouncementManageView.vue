@@ -16,12 +16,12 @@
         <a-button size="small" @click="resetFilters">重置</a-button>
       </div>
       <a-table :data-source="rows" :columns="columns" rowKey="id" size="middle" :pagination="false">
-        <template #title="{ record }">
-          <span class="title-cell">
-            <a-tag :color="typeColor(record?.type)" style="margin-right:4px">{{ typeLabel(record?.type) }}</a-tag>
-            <a @click="showDetail(record)">{{ record?.title }}</a>
-          </span>
-        </template>
+<!--        <template #title="{ record }">-->
+<!--          <span class="title-cell">-->
+<!--            <a-tag :color="typeColor(record?.type)" style="margin-right:4px">{{ typeLabel(record?.type) }}</a-tag>-->
+<!--            <a @click="showDetail(record)">{{ record?.title }}</a>-->
+<!--          </span>-->
+<!--        </template>-->
         <template #type="{ record }">
           <span>{{ typeLabel(record?.type) }}</span>
         </template>

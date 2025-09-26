@@ -6,6 +6,18 @@ const instance = axios.create({
   timeout: 10000
 })
 
+let isRefreshing = false;
+let refreshSubscribers = [];
+
+function onRefreshed(token) {
+  refreshSubscribers.forEach(cb => cb(token));
+  refreshSubscribers = [];
+}
+
+function addRefreshSubscriber(cb) {
+  refreshSubscribers.push(cb);
+}
+
 instance.interceptors.request.use(config => {
   const token = localStorage.getItem('token')
   if (token) {
@@ -28,28 +40,57 @@ instance.interceptors.response.use(
     // 兼容非统一返回结构
     return res
   },
-  error => {
+  async error => {
+    const originalRequest = error.config;
     if (error.response) {
-      // 处理 401 未授权
+      // 401 未授权
       if (error.response.status === 401) {
-        // 清除本地token
-        localStorage.removeItem('token')
-        // 可根据实际路由跳转到登录页
-        // window.location.href = '/login'
-        window.location.hash = '#/login'
-        // 或者使用弹窗提示
-        // alert('登录已过期，请重新登录')
-      } else if (
-        error.response.data &&
-        error.response.data.error &&
-        error.response.data.error.includes('Token已过期')
-      ) {
-        localStorage.removeItem('token')
-        // window.location.href = '/login'
-        window.location.hash = '#/login'
+        // 检查是否 token 过期且有 refreshToken
+        const refreshToken = localStorage.getItem('refresh_token');
+        if (refreshToken && !originalRequest._retry) {
+          if (!isRefreshing) {
+            isRefreshing = true;
+            // 假设有刷新token的API
+            try {
+              const resp = await axios.post('http://localhost:9697/api/auth/refresh', { refreshToken });
+              const { token: newToken, refreshToken: newRefreshToken } = resp.data.data || {};
+              localStorage.setItem('token', newToken);
+              localStorage.setItem('refresh_token', newRefreshToken);
+              onRefreshed(newToken);
+              isRefreshing = false;
+              originalRequest._retry = true;
+              originalRequest.headers['Authorization'] = 'Bearer ' + newToken;
+              return instance(originalRequest);
+            } catch (e) {
+              isRefreshing = false;
+              localStorage.removeItem('token');
+              localStorage.removeItem('refresh_token');
+              window.location.hash = '#/login';
+              return Promise.reject(e);
+            }
+          } else {
+            // 队列等待刷新完成
+            return new Promise((resolve, reject) => {
+              addRefreshSubscriber(token => {
+                originalRequest._retry = true;
+                originalRequest.headers['Authorization'] = 'Bearer ' + token;
+                resolve(instance(originalRequest));
+              });
+            });
+          }
+        } else {
+          localStorage.removeItem('token');
+          localStorage.removeItem('refresh_token');
+          window.location.hash = '#/login';
+        }
+      } else {
+        // 其它错误
+        message.error(error.response.data?.msg || '请求异常');
       }
+    } else {
+      message.error('网络异常');
     }
-    return Promise.reject(error)
+    return Promise.reject(error);
   }
 )
 
