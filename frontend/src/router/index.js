@@ -32,6 +32,7 @@ const routes = [
   { path: '/community/:id', component: CommunityDetailView },
   { path: '/service', component: ServiceView },
   { path: '/service/:id', component: ServiceDetailView },
+  { path: '/member', component: MemberView },
   { path: '/admin', component: AdminView },
   { path: '/admin/user-manage', component: () => import('../components/admin/UserManageView.vue') },
   { path: '/admin/role-manage', component: () => import('../components/admin/RoleManageView.vue') },
@@ -44,6 +45,8 @@ const routes = [
   { path: '/system-monitor', component: () => import('../components/admin/SystemMonitor.vue') },
   { path: '/announcements', component: () => import('../components/AnnouncementListView.vue'), meta:{ title:'公告'} },
   { path: '/admin/announcement-manage', component: () => import('../components/admin/AnnouncementManageView.vue') },
+  { path: '/chat', component: () => import('../components/ChatView.vue'), meta:{ title:'聊天'} },
+  { path: '/contacts', component: () => import('../components/ContactListView.vue'), meta:{ title:'通讯录'} },
 ]
 
 const router = createRouter({

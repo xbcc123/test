@@ -151,4 +151,38 @@ export function setCatShopStatus(id, status) {
   return instance.put(`/api/catshop/${id}/status?status=${status}`)
 }
 
+// 即时通讯 IM 相关 API
+export function apiChatConversations() {
+  return instance.get('/api/chat/conversations')
+}
+export function apiChatMessages(targetUserId, page=0, size=50, markRead=true) {
+  return instance.get(`/api/chat/messages`, { params: { targetUserId, page, size, markRead } })
+}
+export function apiChatSendHttp(toUserId, content) {
+  return instance.post('/api/chat/send', { toUserId, content })
+}
+export function apiChatMarkRead(targetUserId) {
+  return instance.post('/api/chat/read', { targetUserId })
+}
+export function apiChatUnreadTotal() {
+  return instance.get('/api/chat/unread/total')
+}
+
+// 通讯录相关 API
+export function apiContactsList(){
+  return instance.get('/api/contacts')
+}
+export function apiContactsAdd(contactUserId, remark){
+  return instance.post('/api/contacts',{ contactUserId, remark })
+}
+export function apiContactsUpdateRemark(contactUserId, remark){
+  return instance.put(`/api/contacts/${contactUserId}/remark`, { remark })
+}
+export function apiContactsSetBlocked(contactUserId, blocked){
+  return instance.put(`/api/contacts/${contactUserId}/block`, null, { params:{ blocked } })
+}
+export function apiContactsDelete(contactUserId){
+  return instance.delete(`/api/contacts/${contactUserId}`)
+}
+
 export default instance
