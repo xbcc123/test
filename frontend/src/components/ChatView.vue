@@ -82,6 +82,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { getToken, getUserId } from '../utils/auth'
 import { message as antdMsg } from 'ant-design-vue'
 import {
@@ -166,6 +167,8 @@ function openConversation(){
     antdMsg.warning('请输入有效用户ID')
     return
   }
+  activeTarget.value = id
+  loadMessages(id)
   openConversationById(id)
 }
 
@@ -200,6 +203,7 @@ function initWs(){
       const msg = JSON.parse(evt.data)
       if(msg.type==='chat' && msg.data){
         const d = msg.data
+        // 如果是当前会话双方消息才加入
         if(activeTarget.value && (d.fromUserId===activeTarget.value || d.toUserId===activeTarget.value)){
           messages.value.push(d)
           scrollToBottom()
@@ -221,6 +225,8 @@ function scheduleReconnect(){
 
 onMounted(async ()=>{
   await refreshConversations()
+onMounted(()=>{
+  refreshConversations()
   initWs()
   const qid = Number(route.query.uid)
   if(qid>0){

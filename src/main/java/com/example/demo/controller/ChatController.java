@@ -70,6 +70,7 @@ public class ChatController {
             }
             return ApiResponse.error(ErrorCode.BUSINESS_ERROR, e.getMessage());
         }
+        return ApiResponse.success(chatService.sendMessage(uid, toUserId, content));
     }
 
     @PostMapping("/read")
@@ -92,3 +93,4 @@ public class ChatController {
         return ApiResponse.success(chatService.totalUnread(uid));
     }
 }
+

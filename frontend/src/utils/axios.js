@@ -168,6 +168,23 @@ export function apiChatUnreadTotal() {
   return instance.get('/api/chat/unread/total')
 }
 
+// 即时通讯 IM 相关 API
+export function apiChatConversations() {
+  return instance.get('/api/chat/conversations')
+}
+export function apiChatMessages(targetUserId, page=0, size=50, markRead=true) {
+  return instance.get(`/api/chat/messages`, { params: { targetUserId, page, size, markRead } })
+}
+export function apiChatSendHttp(toUserId, content) {
+  return instance.post('/api/chat/send', { toUserId, content })
+}
+export function apiChatMarkRead(targetUserId) {
+  return instance.post('/api/chat/read', { targetUserId })
+}
+export function apiChatUnreadTotal() {
+  return instance.get('/api/chat/unread/total')
+}
+
 // 通讯录相关 API
 export function apiContactsList(){
   return instance.get('/api/contacts')
