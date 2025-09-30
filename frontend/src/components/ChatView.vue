@@ -82,7 +82,6 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
-import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { getToken, getUserId } from '../utils/auth'
 import { message as antdMsg } from 'ant-design-vue'
 import {
@@ -223,8 +222,6 @@ function scheduleReconnect(){
   }, 5000)
 }
 
-onMounted(async ()=>{
-  await refreshConversations()
 onMounted(()=>{
   refreshConversations()
   initWs()
@@ -234,7 +231,6 @@ onMounted(()=>{
     openConversationById(qid)
   }
 })
-
 watch(()=>route.query.uid,(nv)=>{
   const qid = Number(nv)
   if(qid>0){
