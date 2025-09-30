@@ -51,6 +51,11 @@
     <a-menu-item key="announcement-manage">
       <router-link to="/admin/announcement-manage">公告管理</router-link>
     </a-menu-item>
+    <a-menu-item key="chat">
+      <a-badge :count="chatUnread" :overflow-count="99" style="line-height:1;">
+        <router-link to="/chat">即时聊天</router-link>
+      </a-badge>
+    </a-menu-item>
     <a-menu-item key="logout" style="float:right;margin-left:auto;">
       <a-button type="link" @click="logout" style="color:#d00;font-weight:bold;">退出登录</a-button>
     </a-menu-item>
@@ -60,8 +65,31 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import { removeToken } from '../utils/auth'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { getToken } from '../utils/auth'
+import { apiChatUnreadTotal } from '../utils/axios'
 
 const router = useRouter()
+const chatUnread = ref(0)
+let unreadTimer = null
+
+async function fetchUnread() {
+  if (!getToken()) return
+  try {
+    const v = await apiChatUnreadTotal()
+    chatUnread.value = typeof v === 'number' ? v : 0
+  } catch { /* ignore */ }
+}
+
+onMounted(() => {
+  fetchUnread()
+  unreadTimer = setInterval(fetchUnread, 30000)
+})
+
+onBeforeUnmount(() => {
+  if (unreadTimer) clearInterval(unreadTimer)
+})
+
 function logout() {
   // 清空所有 localStorage
   localStorage.clear()
