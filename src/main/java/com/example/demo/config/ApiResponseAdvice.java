@@ -11,7 +11,10 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 public class ApiResponseAdvice implements ResponseBodyAdvice<Object> {
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
-        // 可根据需要过滤（如只处理 @RestController/@ResponseBody）
+        // 排除 ResponseEntity 和 byte[] 返回值，避免包装视频流等二进制数据
+        Class<?> paramType = returnType.getParameterType();
+        if (org.springframework.http.ResponseEntity.class.isAssignableFrom(paramType)) return false;
+        if (byte[].class.isAssignableFrom(paramType)) return false;
         return true;
     }
 
@@ -24,8 +27,7 @@ public class ApiResponseAdvice implements ResponseBodyAdvice<Object> {
         if (body instanceof ApiResponse) {
             return body;
         }
-        // 这里可根据实际情况���断是否包装
+        // 这里可根据实际情况决定是否包装
         return ApiResponse.success(body);
     }
 }
-

@@ -185,4 +185,18 @@ export function apiContactsDelete(contactUserId){
   return instance.delete(`/api/contacts/${contactUserId}`)
 }
 
+// 视频相关 API
+export function apiVideoPage(page=0,size=10){
+  return instance.get('/api/videos/page',{ params:{ page,size } })
+}
+export function apiVideoGet(id){
+  return instance.get(`/api/videos/${id}`)
+}
+export function apiVideoDelete(id){
+  return instance.delete(`/api/videos/${id}`)
+}
+export function apiVideoUpload(formData){
+  return instance.post('/api/videos', formData, { headers:{ 'Content-Type':'multipart/form-data' } })
+}
+
 export default instance

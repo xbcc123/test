@@ -47,6 +47,9 @@ const routes = [
   { path: '/admin/announcement-manage', component: () => import('../components/admin/AnnouncementManageView.vue') },
   { path: '/chat', component: () => import('../components/ChatView.vue'), meta:{ title:'聊天'} },
   { path: '/contacts', component: () => import('../components/ContactListView.vue'), meta:{ title:'通讯录'} },
+  { path: '/videos', component: () => import('../components/VideoListView.vue'), meta: { title: '视频' } },
+  { path: '/videos/:id', component: () => import('../components/VideoDetailView.vue'), meta: { title: '视频详情' } },
+  { path: '/videos/upload', component: () => import('../components/VideoUploadView.vue'), meta: { title: '上传视频' } },
 ]
 
 const router = createRouter({

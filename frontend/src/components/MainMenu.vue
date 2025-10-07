@@ -54,6 +54,9 @@
     <a-menu-item key="contacts">
       <router-link to="/contacts">通讯录</router-link>
     </a-menu-item>
+    <a-menu-item key="videos">
+      <router-link to="/videos">视频</router-link>
+    </a-menu-item>
     <a-menu-item key="chat">
       <a-badge :count="chatUnread" :overflow-count="99" style="line-height:1;">
         <router-link to="/chat">即时聊天</router-link>
