@@ -27,6 +27,16 @@
     <a-menu-item key="cat-shop">
       <router-link to="/cat-shop">宠物买卖</router-link>
     </a-menu-item>
+    <a-menu-item key="cart">
+      <router-link to="/cart">
+        <a-badge :count="cartCount" :overflow-count="99" style="line-height:1;">
+          购物车
+        </a-badge>
+      </router-link>
+    </a-menu-item>
+    <a-menu-item key="orders">
+      <router-link to="/orders">我的订单</router-link>
+    </a-menu-item>
     <a-menu-item key="system-monitor">
       <router-link to="/system-monitor">系统监控</router-link>
     </a-menu-item>
@@ -78,6 +88,8 @@ import { apiChatUnreadTotal } from '../utils/axios'
 const router = useRouter()
 const chatUnread = ref(0)
 let unreadTimer = null
+const cartCount = ref(0)
+let cartTimer = null
 
 async function fetchUnread() {
   if (!getToken()) return
@@ -87,13 +99,25 @@ async function fetchUnread() {
   } catch { /* ignore */ }
 }
 
+function fetchCartCount() {
+  try {
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]')
+    cartCount.value = cart.reduce((s, i) => s + (i.quantity || 0), 0)
+  } catch {
+    cartCount.value = 0
+  }
+}
+
 onMounted(() => {
   fetchUnread()
   unreadTimer = setInterval(fetchUnread, 30000)
+  fetchCartCount()
+  cartTimer = setInterval(fetchCartCount, 1500)
 })
 
 onBeforeUnmount(() => {
   if (unreadTimer) clearInterval(unreadTimer)
+  if (cartTimer) clearInterval(cartTimer)
 })
 
 function logout() {

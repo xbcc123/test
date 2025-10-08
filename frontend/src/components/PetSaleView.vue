@@ -1,7 +1,10 @@
 <template>
   <section class="petsale-section">
     <h2 class="petsale-title">宠物出售信息</h2>
-    <a-button type="primary" @click="goPublish" style="margin-bottom: 16px;">发布宠物</a-button>
+    <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;">
+      <a-button type="primary" @click="goPublish">发布宠物</a-button>
+      <a-button @click="goCart">查看购物车</a-button>
+    </div>
     <div class="pet-card-list">
       <a-card
         v-for="pet in pets"
@@ -16,6 +19,10 @@
           :description="'￥' + pet.price + ' | ' + (pet.status || '在售')"
         />
         <div class="pet-card-desc">{{ pet.description?.slice(0, 30) + (pet.description?.length > 30 ? '...' : '') }}</div>
+        <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;">
+          <a-button type="primary" size="small" @click.stop="addToCart(pet)">加入购物车</a-button>
+          <a-button size="small" @click.stop="openDetail(pet)">查看详情</a-button>
+        </div>
       </a-card>
     </div>
     <a-modal v-model:open="showDetail" title="宠物详情" :footer="null" width="520px">
@@ -27,6 +34,9 @@
         <p><b>状态：</b>{{ currentPet.status }}</p>
         <p><b>卖家ID：</b>{{ currentPet.sellerId }}</p>
         <p><b>描述：</b>{{ currentPet.description }}</p>
+        <div style="margin-top:12px;">
+          <a-button type="primary" @click="addToCart(currentPet)">加入购物车</a-button>
+        </div>
       </div>
     </a-modal>
   </section>
@@ -57,9 +67,38 @@ const goPublish = () => {
   router.push('/pet-sale/publish')
 }
 
+const goCart = () => {
+  router.push('/cart')
+}
+
 const openDetail = (pet) => {
   currentPet.value = pet
   showDetail.value = true
+}
+
+function addToCart(pet) {
+  try {
+    const cartRaw = localStorage.getItem('cart') || '[]'
+    const cart = JSON.parse(cartRaw)
+    const productId = pet.id || pet.productId
+    const existing = cart.find(i => i.productId === productId)
+    if (existing) {
+      existing.quantity = (existing.quantity || 1) + 1
+    } else {
+      cart.push({
+        productId,
+        productName: pet.name || pet.productName,
+        price: Number(pet.price || pet.price || 0),
+        imgUrl: pet.imgUrl || pet.img || '',
+        quantity: 1
+      })
+    }
+    localStorage.setItem('cart', JSON.stringify(cart))
+    message.success('已加入购物车')
+  } catch (e) {
+    console.error(e)
+    message.error('加入购物车失败')
+  }
 }
 
 onMounted(loadPets)

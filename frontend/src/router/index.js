@@ -19,6 +19,10 @@ import { getToken } from '../utils/auth'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 NProgress.configure({ showSpinner: false, speed: 380, trickleSpeed: 120 })
+import CartView from '../components/CartView.vue'
+import OrderListView from '../components/OrderListView.vue'
+import OrderDetailView from '../components/OrderDetailView.vue'
+import PetSalePublish from '../components/PetSalePublish.vue'
 
 const routes = [
   { path: '/login', component: LoginView, meta: { title: '登录' } },
@@ -42,6 +46,10 @@ const routes = [
   { path: '/service-order', component: ServiceOrderView },
   { path: '/pet-disease', component: PetDiseaseView },
   { path: '/cat-shop', component: CatShopView },
+  { path: '/pet-sale/publish', component: PetSalePublish },
+  { path: '/cart', component: CartView },
+  { path: '/orders', component: OrderListView, name: 'OrderList' },
+  { path: '/order/:orderId', component: OrderDetailView, name: 'OrderDetail' },
   { path: '/system-monitor', component: () => import('../components/admin/SystemMonitor.vue') },
   { path: '/announcements', component: () => import('../components/AnnouncementListView.vue'), meta:{ title:'公告'} },
   { path: '/admin/announcement-manage', component: () => import('../components/admin/AnnouncementManageView.vue') },
